@@ -1,0 +1,57 @@
+@if(cargando()){
+  <div class="loading container" role="status"><span class="spinner"></span>Cargando contenido…</div>
+}
+
+@if(error()){
+  <div class="container error-state" role="alert">
+    <h1>No pudimos cargar la página</h1>
+    <p>{{error()}}</p>
+    <button class="btn" (click)="cargar()">Volver a intentar</button>
+  </div>
+}
+
+@if(sitio(); as s){
+  <app-carrusel-pagina [sitio]="s" tipo="CARRUSEL_NOSOTROS" pagina="Nosotros" />
+
+  <!-- ========== PÁGINA: NOSOTROS ========== -->
+  <section class="section container about-page">
+    @if(items('NOSOTROS')[0];as c){
+      <div>
+        <span class="eyebrow">{{c.subtitulo}}</span>
+        <h1>{{c.titulo}}</h1>
+        <p class="preserve-lines">{{c.descripcion}}</p>
+        <a class="btn" routerLink="/contactos">Hablemos de tu próximo hogar ↗</a>
+      </div>
+      <img [src]="c.imagen" [alt]="c.titulo">
+    }@else{
+      <div>
+        <span class="eyebrow">NOSOTROS</span>
+        <h1>{{s.configuracion.nombre}}</h1>
+        <p>{{s.configuracion.lema}}</p>
+      </div>
+    }
+  </section>
+
+  @if(seccion('NOSOTROS_VALORES'); as encabezado){
+    @if(encabezado.activo && items('NOSOTROS_VALORES').length){
+      <section class="values-section" aria-labelledby="values-title">
+        <div class="container">
+          <header class="values-heading">
+            <h2 id="values-title">{{encabezado.titulo}}</h2>
+            <span class="values-rule" aria-hidden="true"></span>
+            <p>{{encabezado.subtitulo}}</p>
+          </header>
+          <div class="values-grid">
+            @for(tarjeta of items('NOSOTROS_VALORES'); track tarjeta.id){
+              <article class="value-card">
+                <h3>{{tarjeta.titulo}}</h3>
+                <p class="preserve-lines">{{tarjeta.descripcion}}</p>
+              </article>
+            }
+          </div>
+        </div>
+      </section>
+    }
+  }
+
+}

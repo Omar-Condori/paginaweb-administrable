@@ -1,0 +1,120 @@
+/* ==========================================================================
+   TEMA DÍA / NOCHE
+   Día  = estilos base de styles.css (sin cambios).
+   Noche = este archivo: redefine variables y los colores literales
+   bajo :root[data-theme='dark']. El carrusel (hero) no se modifica.
+   ========================================================================== */
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ink: #86a8f5;          /* títulos y enlaces (legibles sobre fondo oscuro) */
+  --ink-dark: #070a12;     /* pie de página y menú lateral */
+  --text: #e5e8ee;
+  --muted: #9aa3b2;
+  --line: #272b34;
+  --cream: #15181e;
+  --paper: #14171c;
+  background: #0a0a0b;
+}
+
+:root[data-theme='dark'] body { background: #0a0a0b; color: var(--text); }
+@media (prefers-reduced-motion: no-preference) {
+  body { transition: background-color .3s ease, color .3s ease; }
+}
+
+/* ---------- Base ---------- */
+:root[data-theme='dark'] .eyebrow { color: #d3b48a; }
+:root[data-theme='dark'] .btn { background: #2456b8; }
+:root[data-theme='dark'] .btn:hover { background: #1c479b; }
+:root[data-theme='dark'] .btn.cream { background: #f5ead6; color: #1c479b; }
+:root[data-theme='dark'] .btn.secondary { background: #1a1d24; color: #e5e8ee; border-color: #2c313b; }
+:root[data-theme='dark'] .alert.error { background: #3a1a1c; color: #ffb4b6; border-color: #5c2a2d; }
+:root[data-theme='dark'] .alert.success { background: #16301f; color: #a8e0b8; border-color: #234a31; }
+
+/* ---------- Formularios ---------- */
+:root[data-theme='dark'] label { color: #b7c0cf; }
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] textarea,
+:root[data-theme='dark'] select { background: #14171c; color: #e5e8ee; border-color: #2c313b; }
+:root[data-theme='dark'] input:focus,
+:root[data-theme='dark'] textarea:focus,
+:root[data-theme='dark'] select:focus { border-color: #4f77d8; outline-color: #1d3a78; }
+:root[data-theme='dark'] input::placeholder,
+:root[data-theme='dark'] textarea::placeholder { color: #6c7686; }
+
+/* ---------- Encabezado y pie ---------- */
+:root[data-theme='dark'] .site-header.scrolled { background: #0d1830; }
+:root[data-theme='dark'] .site-header nav.open { background: #14171c; box-shadow: 0 15px 20px #0008; }
+:root[data-theme='dark'] .site-header nav.open a { color: #d5d9e2; }
+:root[data-theme='dark'] .site-footer { background: var(--ink-dark); }
+
+/* ---------- Títulos de sección ---------- */
+:root[data-theme='dark'] .section-heading h2,
+:root[data-theme='dark'] .section-heading h1 { color: #7f9ef0; }
+:root[data-theme='dark'] .section-heading p { color: #a4acba; }
+
+/* ---------- Tarjetas y superficies ---------- */
+:root[data-theme='dark'] .project-card,
+:root[data-theme='dark'] .model-card,
+:root[data-theme='dark'] .testimonial-card,
+:root[data-theme='dark'] .sales-card,
+:root[data-theme='dark'] .value-card,
+:root[data-theme='dark'] .panel,
+:root[data-theme='dark'] .stat-card,
+:root[data-theme='dark'] .quick-card,
+:root[data-theme='dark'] .media-card { background: #14171c; border-color: #272b34; }
+:root[data-theme='dark'] .project-card:hover { box-shadow: 0 12px 35px #0009; }
+:root[data-theme='dark'] .image-label { background: #14171cea; color: #dbe6ff; }
+:root[data-theme='dark'] .model-section,
+:root[data-theme='dark'] .testimonial-section,
+:root[data-theme='dark'] .values-section { background: #0a0a0b; }
+:root[data-theme='dark'] .quote-mark { color: #242a33; }
+:root[data-theme='dark'] .testimonial-card blockquote { color: #aab3c2; }
+:root[data-theme='dark'] .person img { background: #1c2027; }
+:root[data-theme='dark'] .sales-card > img,
+:root[data-theme='dark'] .media-card > img { background: #1c2027; }
+:root[data-theme='dark'] .value-card { box-shadow: 0 6px 32px #0007; }
+:root[data-theme='dark'] .value-card h3 { color: #dfe4ee; }
+:root[data-theme='dark'] .value-card p { color: #9aa3b2; }
+:root[data-theme='dark'] .values-heading h2 { color: #7f9ef0; }
+:root[data-theme='dark'] .values-heading p { color: #9aa3b2; }
+:root[data-theme='dark'] .map-panel { background: #14171c; }
+:root[data-theme='dark'] .map-empty > span { color: #6c7686; }
+
+/* ---------- Panel de administración ---------- */
+:root[data-theme='dark'] .admin-shell { background: #0a0a0b; }
+:root[data-theme='dark'] .admin-topbar { background: #111318; border-color: #272b34; }
+:root[data-theme='dark'] .sidebar-link.selected { background: #1e2c4f; color: #dbe6ff; }
+:root[data-theme='dark'] .sidebar-link.selected > span { color: #9db8ff; }
+:root[data-theme='dark'] .avatar { background: #1d222b; color: #aab8c9; }
+:root[data-theme='dark'] .stat-card > span,
+:root[data-theme='dark'] .stat-card small,
+:root[data-theme='dark'] .quick-card small,
+:root[data-theme='dark'] .table-item small,
+:root[data-theme='dark'] .empty-state > span { color: #9aa3b2; }
+:root[data-theme='dark'] .stat-card:hover,
+:root[data-theme='dark'] .quick-card:hover { box-shadow: 0 8px 24px #0008; border-color: #3b4a72; }
+:root[data-theme='dark'] .quick-icon { background: #1b2230; color: #8fb0ff; }
+:root[data-theme='dark'] .info-card { background: #14201a; border-color: #223329; }
+:root[data-theme='dark'] .info-card strong { color: #9fd08a; }
+:root[data-theme='dark'] .info-card p { color: #a7b99a; }
+:root[data-theme='dark'] th { background: #14171c; color: #9aa3b2; border-color: #272b34; }
+:root[data-theme='dark'] td { border-color: #20242c; }
+:root[data-theme='dark'] .count { background: #1c2028; color: #9aa3b2; }
+:root[data-theme='dark'] .status-chip { background: #173022; color: #8fd0a2; }
+:root[data-theme='dark'] .status-chip.hidden-chip { background: #22252b; color: #9aa0aa; }
+:root[data-theme='dark'] .order-btn:hover:not(:disabled) { background: #1d222b; }
+:root[data-theme='dark'] .row-actions button,
+:root[data-theme='dark'] .danger-text { color: #9ab3a5; }
+:root[data-theme='dark'] .danger-text,
+:root[data-theme='dark'] .row-actions .danger-text { color: #e08a8d; }
+:root[data-theme='dark'] .editor-sheet { background: #14171c; box-shadow: -10px 0 40px #000a; }
+:root[data-theme='dark'] .editor-footer { background: #111318; border-color: #272b34; }
+:root[data-theme='dark'] .image-picker { background: #111318; border-color: #272b34; }
+:root[data-theme='dark'] .upload-drop { border-color: #3a4150; color: #9db8ff; }
+:root[data-theme='dark'] .upload-drop:hover { background: #1b2230; }
+:root[data-theme='dark'] .preview-eye { background: #14171c; border-color: #2c313b; color: #8fb0ff; }
+:root[data-theme='dark'] .preview-eye:hover { background: #1b2230; }
+:root[data-theme='dark'] .image-viewer { background: #14171c; color: #e5e8ee; }
+:root[data-theme='dark'] .viewer-close { background: #222730; color: #e5e8ee; }
+:root[data-theme='dark'] .missing-thumbnail { background: #1c2027; color: #9aa3b2; }

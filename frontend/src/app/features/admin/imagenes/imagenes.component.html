@@ -1,0 +1,41 @@
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">RECURSOS DEL SITIO</span>
+    <h1>Biblioteca de imágenes</h1>
+    <p>JPG o PNG · Máximo 8 MB y 16 megapíxeles por imagen.</p>
+  </div>
+  <label class="btn upload-label">{{subiendo()?'Subiendo…':'＋ Subir imagen'}}<input type="file" accept="image/jpeg,image/png" (change)="subir($event)" [disabled]="subiendo()"></label>
+</div>
+
+@if(error()){
+  <div class="alert error" role="alert">
+    {{error()}}
+    <button aria-label="Cerrar error" (click)="error.set('')">×</button>
+  </div>
+}
+@if(aviso()){
+  <div class="alert success" role="status">
+    {{aviso()}}
+    <button aria-label="Cerrar aviso" (click)="aviso.set('')">×</button>
+  </div>
+}
+
+@if(archivos().length===0){
+  <div class="panel empty-state">
+    <h3>Tus imágenes, en un solo lugar</h3>
+    <p>Sube la primera fotografía para utilizarla en cualquier sección.</p>
+  </div>
+}
+
+<div class="media-grid">
+  @for(a of archivos(); track a.nombre){
+    <article class="media-card">
+      <img [src]="a.url" [alt]="a.original" loading="lazy">
+      <div>
+        <strong>{{a.original}}</strong>
+        <small>{{(a.bytes/1024).toFixed(0)}} KB</small>
+        <button class="danger-text" (click)="borrarImagen(a)" [disabled]="false">Eliminar imagen</button>
+      </div>
+    </article>
+  }
+</div>

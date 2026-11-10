@@ -1,0 +1,6 @@
+/* Imagenes Component Styles */
+:host {
+  display: block;
+}
+
+/* Uses shared admin styles from admin-layout.component.css */

@@ -1,0 +1,41 @@
+@if(cargando()){
+  <div class="loading container" role="status"><span class="spinner"></span>Cargando contenido…</div>
+}
+
+@if(error()){
+  <div class="container error-state" role="alert">
+    <h1>No pudimos cargar la página</h1>
+    <p>{{error()}}</p>
+    <button class="btn" (click)="cargar()">Volver a intentar</button>
+  </div>
+}
+
+@if(sitio(); as s){
+  <app-carrusel-pagina [sitio]="s" tipo="CARRUSEL_PROYECTOS" pagina="Proyectos" />
+
+  <!-- ========== PÁGINA: PROYECTOS ========== -->
+  <section class="section container" id="proyectos">
+    <div class="section-heading centered">
+      <span class="eyebrow">{{seccion('PROYECTO')?.titulo}}</span>
+      <h2>{{seccion('PROYECTO')?.subtitulo}}</h2>
+      <span class="heading-rule"></span>
+    </div>
+
+    <div class="cards-grid">
+      @for(c of items('PROYECTO');track c.id){
+        <article class="project-card">
+          <div class="card-image">
+            <img [src]="c.imagen" [alt]="c.titulo" loading="lazy">
+            <span class="image-label">{{c.subtitulo}}</span>
+          </div>
+          <div class="card-body">
+            <h3>{{c.titulo}}</h3>
+            <p>{{c.descripcion}}</p>
+            <a routerLink="/contactos" class="text-link">Quiero conocer más <span>↗</span></a>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+
+}

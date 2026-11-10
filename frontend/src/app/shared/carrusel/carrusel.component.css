@@ -1,0 +1,14 @@
+:host { display: block; }
+.page-carousel { position: relative; isolation: isolate; min-height: 440px; height: min(65vh, 640px); display: flex; flex-direction: column; justify-content: flex-end; color: white; background: #182d4b; overflow: hidden; }
+.carousel-photo, .carousel-shade { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.carousel-photo { object-fit: cover; }
+.carousel-shade { background: linear-gradient(0deg, #0b1629de, #0b16291a); }
+.carousel-copy { padding-top: 48px; padding-bottom: 44px; }
+.carousel-copy .eyebrow { color: #e8d8b5; }
+.carousel-copy h1 { color: white; max-width: 850px; font-size: clamp(2rem, 4.5vw, 4rem); line-height: 1.1; margin: 14px 0; }
+.carousel-copy p { color: #ffffffeb; font-size: clamp(1rem, 2vw, 1.4rem); max-width: 750px; margin: 0; }
+.carousel-controls { display: flex; align-items: center; gap: 14px; padding-bottom: 24px; }
+.carousel-controls button { width: 42px; height: 42px; border: 1px solid #ffffff80; border-radius: 50%; background: #ffffff18; color: white; cursor: pointer; }
+.carousel-controls button:hover { background: #ffffff38; }
+.carousel-controls button:focus-visible { outline: 3px solid white; outline-offset: 3px; }
+@media (max-width: 600px) { .page-carousel { min-height: 340px; height: 55vh; } .carousel-copy { padding-bottom: 28px; } }

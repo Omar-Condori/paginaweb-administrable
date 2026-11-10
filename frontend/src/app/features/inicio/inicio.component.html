@@ -1,0 +1,183 @@
+<!-- ========== PÁGINA: INICIO ========== -->
+@if(cargando()){
+  <div class="loading container" role="status"><span class="spinner"></span>Cargando contenido…</div>
+}
+
+@if(error()){
+  <div class="container error-state" role="alert">
+    <h1>No pudimos cargar la página</h1>
+    <p>{{error()}}</p>
+    <button class="btn" (click)="cargar()">Volver a intentar</button>
+  </div>
+}
+
+@if(sitio(); as s){
+
+  <!-- ========== PÁGINA: INICIO ========== -->
+  
+  <!-- Carrusel / Hero -->
+  @if(visible('CARRUSEL')){
+    @if(items('CARRUSEL')[slide()]; as c){
+      <section class="hero" aria-roledescription="carrusel" aria-label="Proyectos destacados">
+        <!-- Cada slide se recrea al cambiar: dispara las animaciones CSS; la anterior queda debajo mientras sale -->
+        @for(foto of [c]; track foto){
+          <div class="hero-slide" animate.leave="hero-slide-leave">
+            <img class="hero-image" [src]="foto.imagen" [alt]="foto.titulo" fetchpriority="high">
+            <div class="hero-shade"></div>
+            <div class="hero-frame hero-frame--outer" aria-hidden="true"><img [src]="foto.imagen" alt=""></div>
+            <div class="hero-frame hero-frame--inner" aria-hidden="true"><img [src]="foto.imagen" alt=""></div>
+            <span class="hero-wave" aria-hidden="true"></span>
+
+            <div class="hero-copy">
+              <h1>{{foto.titulo}}</h1>
+              <p class="hero-subtitle">{{foto.subtitulo}}</p>
+              <a class="btn cream" href="#proyectos">Descubre nuestros proyectos ↗</a>
+            </div>
+          </div>
+        }
+
+        <div class="container hero-bottom">
+          <div class="carousel-controls">
+            <button (click)="mover(-1)" aria-label="Imagen anterior">←</button>
+            <span>{{slide()+1}} / {{items('CARRUSEL').length}}</span>
+            <button (click)="mover(1)" aria-label="Imagen siguiente">→</button>
+            <button (click)="reproduciendo.set(!reproduciendo())" [attr.aria-label]="reproduciendo()?'Pausar carrusel':'Reproducir carrusel'">{{reproduciendo()?'Ⅱ':'▶'}}</button>
+          </div>
+        </div>
+      </section>
+    }
+  }
+
+  <!-- Proyectos -->
+  @if(visible('PROYECTO')){
+    <section class="section container" id="proyectos">
+      <div class="section-heading centered">
+        <span class="eyebrow">{{seccion('PROYECTO')?.titulo}}</span>
+        <h2>{{seccion('PROYECTO')?.subtitulo}}</h2>
+        <span class="heading-rule"></span>
+      </div>
+
+      <div class="cards-grid">
+        @for(c of items('PROYECTO');track c.id){
+          <article class="project-card">
+            <div class="card-image">
+              <img [src]="c.imagen" [alt]="c.titulo" loading="lazy">
+              <span class="image-label">{{c.subtitulo}}</span>
+            </div>
+            <div class="card-body">
+              <h3>{{c.titulo}}</h3>
+              <p>{{c.descripcion}}</p>
+              <a routerLink="/contactos" class="text-link">Quiero conocer más <span>↗</span></a>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Casa modelo -->
+  @if(visible('CASA_MODELO')){
+    @if(items('CASA_MODELO')[0];as c){
+      <section class="model-section">
+        <div class="container section-heading">
+          <span class="eyebrow">{{seccion('CASA_MODELO')?.titulo}}</span>
+          <h2>{{seccion('CASA_MODELO')?.subtitulo}}</h2>
+        </div>
+
+        <div class="model-stage">
+          <img class="model-backdrop" [src]="c.imagen" [alt]="c.titulo" loading="lazy">
+          <div class="container model-container">
+            <article class="model-card">
+              <img [src]="c.imagenSecundaria" alt="Interior de la casa modelo" loading="lazy">
+              <div>
+                <span class="eyebrow">{{c.subtitulo}}</span>
+                <h3>{{c.titulo}}</h3>
+                <p>{{c.descripcion}}</p>
+                <a class="text-link" routerLink="/contactos">Agenda una visita ↗</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    }
+  }
+
+  <!-- Recreación -->
+  @if(visible('RECREACION')){
+    <section class="section container">
+      <div class="section-heading centered">
+        <span class="eyebrow">{{seccion('RECREACION')?.titulo}}</span>
+        <h2>{{seccion('RECREACION')?.subtitulo}}</h2>
+        <span class="heading-rule"></span>
+      </div>
+
+      <div class="cards-grid">
+        @for(c of items('RECREACION');track c.id){
+          <article class="recreation-card">
+            <img [src]="c.imagen" [alt]="c.titulo" loading="lazy">
+            <div>
+              <h3>{{c.titulo}}</h3>
+              <p>{{c.descripcion}}</p>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Testimonios -->
+  @if(visible('TESTIMONIO')){
+    <section class="testimonial-section">
+      <div class="container">
+        <div class="section-heading centered">
+          <span class="eyebrow">{{seccion('TESTIMONIO')?.titulo}}</span>
+          <h2>{{seccion('TESTIMONIO')?.subtitulo}}</h2>
+          <span class="heading-rule"></span>
+        </div>
+
+        <div class="cards-grid testimonials">
+          @for(c of items('TESTIMONIO');track c.id){
+            <article class="testimonial-card">
+              <span class="quote-mark" aria-hidden="true">“</span>
+              <span class="stars" [attr.aria-label]="c.calificacion+' de 5 estrellas'">{{estrellas(c.calificacion)}}</span>
+              <blockquote>{{c.descripcion}}</blockquote>
+              <div class="person">
+                <img [src]="c.imagen" [alt]="c.titulo" loading="lazy">
+                <div>
+                  <strong>{{c.titulo}}</strong>
+                  <small>{{c.subtitulo}}</small>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Ventas -->
+  @if(visible('VENTAS')){
+    <section class="section container">
+      <div class="section-heading centered">
+        <span class="eyebrow">{{seccion('VENTAS')?.titulo}}</span>
+        <h2>{{seccion('VENTAS')?.subtitulo}}</h2>
+        <span class="heading-rule"></span>
+      </div>
+
+      <div class="cards-grid sales-grid">
+        @for(c of items('VENTAS');track c.id){
+          <article class="sales-card">
+            <img [src]="c.imagen" [alt]="c.titulo" loading="lazy">
+            <div>
+              <span class="eyebrow">{{c.cargo}}</span>
+              <h3>{{c.titulo}}</h3>
+              <p>{{c.descripcion}}</p>
+              <a [href]="contacto(c.contacto)" class="text-link">{{c.contacto}} ↗</a>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+}

@@ -1,0 +1,85 @@
+<a href="#contenido" class="skip-link">Saltar al contenido</a>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header" [class.scrolled]="scrolled()">
+  <div class="header-inner">
+    <a class="brand" routerLink="/" aria-label="Ir al inicio">
+      <img src="/assets/images/prohabit.png" alt="PROHABIT" class="brand-logo" />
+    </a>
+
+    <button class="menu-toggle icon-btn" (click)="menu.set(!menu())" [attr.aria-expanded]="menu()" aria-label="Abrir navegación">☰</button>
+
+    <div class="header-center">
+      <nav [class.open]="menu()" aria-label="Navegación principal">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
+        <a routerLink="/nosotros" routerLinkActive="active">Nosotros</a>
+        <a routerLink="/proyectos" routerLinkActive="active">Proyectos</a>
+        <a routerLink="/contactos" routerLinkActive="active">Contactos</a>
+      </nav>
+    </div>
+
+    <app-tema-toggle class="header-tema" />
+  </div>
+</header>
+
+<!-- ============ CONTENIDO ============ -->
+<main id="contenido">
+  <router-outlet />
+</main>
+
+<!-- ============ FOOTER ============ -->
+@if(sitio(); as s){
+  <footer class="site-footer">
+    <div class="container footer-grid">
+
+      <div>
+        <a class="brand light" routerLink="/">
+          <img src="/assets/images/prohabit.png" alt="PROHABIT" class="brand-logo" style="height: 32px; margin-bottom: 16px;">
+          <span>{{s.configuracion.nombre}}<small>ESPACIOS PARA VIVIR</small></span>
+        </a>
+        <p>{{s.configuracion.lema}}</p>
+      </div>
+
+      <div>
+        <h3>Explora</h3>
+        <a routerLink="/">Inicio</a>
+        <a routerLink="/nosotros">Nosotros</a>
+        <a routerLink="/proyectos">Proyectos</a>
+        <a routerLink="/contactos">Contactos</a>
+      </div>
+
+      <div>
+        <h3>Visítanos</h3>
+        <p>{{s.configuracion.direccion}}</p>
+        <p>{{s.configuracion.horario}}</p>
+        @if(s.configuracion.mapa){
+          <a [href]="s.configuracion.mapa" target="_blank" rel="noopener noreferrer">Ver en Google Maps ↗</a>
+        }
+      </div>
+
+      <div>
+        <h3>Conectemos</h3>
+        @if(s.configuracion.telefono){
+          <a [href]="contacto(s.configuracion.telefono)">{{s.configuracion.telefono}}</a>
+        }
+        @if(s.configuracion.correo){
+          <a [href]="contacto(s.configuracion.correo)">{{s.configuracion.correo}}</a>
+        }
+        <div class="socials">
+          @if(s.configuracion.facebook){
+            <a [href]="s.configuracion.facebook" target="_blank" rel="noopener noreferrer">Facebook ↗</a>
+          }
+          @if(s.configuracion.instagram){
+            <a [href]="s.configuracion.instagram" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <div class="container footer-bottom">
+      <span>© {{s.configuracion.nombre}} · Todos los derechos reservados.</span>
+      <span>Un lugar para tu próxima historia.</span>
+    </div>
+  </footer>
+}

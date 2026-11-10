@@ -1,0 +1,89 @@
+/* Interruptor estilo iOS: se integra en el encabezado (en línea) */
+:host {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+
+:host(.flotante) {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+}
+
+.ios-switch {
+  --w: 51px;
+  --h: 31px;
+  --pad: 2px;
+  --knob: 27px;
+  position: relative;
+  display: block;
+  width: var(--w);
+  height: var(--h);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #e9e9ea;                 /* día: apagado */
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .25), inset 0 0 0 1px rgba(0, 0, 0, .06);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .3s cubic-bezier(.4, 0, .2, 1);
+}
+
+.ios-switch[aria-checked="true"] {
+  background: #34c759;                 /* noche: encendido (verde iOS) */
+}
+
+.ios-switch:focus-visible {
+  outline: 3px solid #0a84ff;
+  outline-offset: 3px;
+}
+
+.knob {
+  position: absolute;
+  top: var(--pad);
+  left: var(--pad);
+  width: var(--knob);
+  height: var(--knob);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .15), 0 1px 1px rgba(0, 0, 0, .16), 0 3px 1px rgba(0, 0, 0, .1);
+  transition: transform .32s cubic-bezier(.3, 1.2, .4, 1), width .2s ease;
+}
+
+.ios-switch[aria-checked="true"] .knob {
+  transform: translateX(calc(var(--w) - var(--knob) - var(--pad) * 2));
+}
+
+/* al presionar, la perilla se estira como en iOS */
+.ios-switch:active .knob { width: 33px; }
+.ios-switch[aria-checked="true"]:active .knob {
+  transform: translateX(calc(var(--w) - 33px - var(--pad) * 2));
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  margin-top: -7.5px;
+  fill: none;
+  stroke: #8e8e93;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity .25s;
+  pointer-events: none;
+}
+
+.sun  { right: 8px; }
+.moon { left: 8px; stroke: #fff; fill: #fff; }
+
+/* solo se ve el icono del lado libre */
+.ios-switch[aria-checked="true"] .sun,
+.ios-switch[aria-checked="false"] .moon { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ios-switch, .knob, .icon { transition: none; }
+}

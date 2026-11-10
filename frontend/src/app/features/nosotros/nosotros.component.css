@@ -1,0 +1,17 @@
+/* Nosotros Component Styles */
+:host {
+  display: block;
+}
+
+/* Uses shared styles from layout.component.css */
+.values-section { background: #f6f7f8; padding: 70px 0; }
+.values-heading { text-align: center; margin-bottom: 32px; }
+.values-heading h2 { color: #1e303c; font-size: clamp(1.8rem, 3vw, 2.6rem); margin: 0; }
+.values-rule { display: block; width: 130px; height: 2px; background: #234ca4; margin: 20px auto 0; }
+.values-heading p { color: #66788e; margin: 8px 0 0; font-size: 1rem; }
+.values-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.value-card { background: white; padding: 48px 34px; border-radius: 12px; box-shadow: 0 6px 32px #172b4510; min-height: 330px; overflow-wrap: anywhere; }
+.value-card h3 { font-size: 1.55rem; color: #3c4146; margin: 0 0 16px; }
+.value-card p { color: #7c858c; line-height: 1.85; margin: 0; }
+@media (max-width: 900px) { .values-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; } }
+@media (max-width: 600px) { .values-section { padding: 44px 0; } .values-grid { grid-template-columns: 1fr; } .value-card { min-height: 0; padding: 30px 24px; } }

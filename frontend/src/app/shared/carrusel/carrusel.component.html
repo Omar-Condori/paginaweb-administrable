@@ -1,0 +1,19 @@
+@if(actual(); as foto){
+  <section class="page-carousel" aria-roledescription="carrusel" [attr.aria-label]="'Carrusel de ' + pagina()">
+    <img class="carousel-photo" [src]="foto.imagen" [alt]="foto.titulo" fetchpriority="high">
+    <div class="carousel-shade"></div>
+    <div class="container carousel-copy">
+      <span class="eyebrow">{{pagina()}}</span>
+      <h1>{{foto.titulo}}</h1>
+      @if(foto.subtitulo){<p>{{foto.subtitulo}}</p>}
+    </div>
+    @if(fotos().length > 1){
+      <div class="container carousel-controls">
+        <button type="button" (click)="mover(-1)" aria-label="Imagen anterior">←</button>
+        <span>{{(indice() % fotos().length) + 1}} / {{fotos().length}}</span>
+        <button type="button" (click)="mover(1)" aria-label="Imagen siguiente">→</button>
+        <button type="button" (click)="reproduciendo.set(!reproduciendo())" [attr.aria-label]="reproduciendo() ? 'Pausar carrusel' : 'Reproducir carrusel'">{{reproduciendo() ? 'Ⅱ' : '▶'}}</button>
+      </div>
+    }
+  </section>
+}

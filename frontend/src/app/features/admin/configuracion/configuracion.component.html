@@ -1,0 +1,52 @@
+@if(cargando()){
+  <div class="loading" role="status"><span class="spinner"></span>Cargando…</div>
+}
+
+@if(error()){
+  <div class="alert error" role="alert">
+    {{error()}}
+    <button aria-label="Cerrar error" (click)="error.set('')">×</button>
+  </div>
+}
+@if(aviso()){
+  <div class="alert success" role="status">
+    {{aviso()}}
+    <button aria-label="Cerrar aviso" (click)="aviso.set('')">×</button>
+  </div>
+}
+
+@if(config(); as c){
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">IDENTIDAD Y CONTACTO</span>
+      <h1>Datos generales</h1>
+      <p>Estos datos alimentan el encabezado, el pie de página y Contactos.</p>
+    </div>
+  </div>
+
+  <form class="panel settings-form" (ngSubmit)="guardarConfig()" #cf="ngForm">
+    <h2>Tu empresa</h2>
+    <div class="form-grid">
+      <label>Nombre comercial<input name="nombre" [(ngModel)]="c.nombre" required maxlength="100"></label>
+      <label>Frase de marca<input name="lema" [(ngModel)]="c.lema" maxlength="240"></label>
+      <label>Teléfono<input name="telefono" [(ngModel)]="c.telefono" maxlength="40"></label>
+      <label>Correo de contacto<input name="correo" type="email" email [(ngModel)]="c.correo" maxlength="180"></label>
+      <label>Dirección<input name="direccion" [(ngModel)]="c.direccion" maxlength="300"></label>
+      <label>Horario de atención<input name="horario" [(ngModel)]="c.horario" maxlength="160"></label>
+    </div>
+
+    <h2>Ubicación y redes sociales</h2>
+    <label>Google Maps: enlace o URL para insertar<input name="mapa" type="url" [(ngModel)]="c.mapa" maxlength="500" placeholder="https://www.google.com/maps/embed?pb=…"><small>Para mostrar el mapa: Google Maps → Compartir → Insertar un mapa. Copia únicamente la URL que aparece entre las comillas de src.</small></label>
+
+    <div class="form-grid">
+      <label>Facebook<input name="facebook" type="url" [(ngModel)]="c.facebook" maxlength="300" placeholder="https://www.facebook.com/…"></label>
+      <label>Instagram<input name="instagram" type="url" [(ngModel)]="c.instagram" maxlength="300" placeholder="https://www.instagram.com/…"></label>
+      <label>WhatsApp (código de país y número)<input name="whatsapp" [(ngModel)]="c.whatsapp" pattern="[0-9]{0,15}" maxlength="15" placeholder="51999999999"><small>Solo números, sin + ni espacios.</small></label>
+    </div>
+
+    <div class="form-actions">
+      <span class="muted">Los campos vacíos no se mostrarán.</span>
+      <button class="btn" [disabled]="cf.invalid||guardando()">{{guardando()?'Guardando…':'Guardar cambios'}}</button>
+    </div>
+  </form>
+}

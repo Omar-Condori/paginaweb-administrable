@@ -1,0 +1,75 @@
+@if(cargando()){
+  <div class="loading container" role="status"><span class="spinner"></span>Cargando contenido…</div>
+}
+
+@if(error()){
+  <div class="container error-state" role="alert">
+    <h1>No pudimos cargar la página</h1>
+    <p>{{error()}}</p>
+    <button class="btn" (click)="cargar()">Volver a intentar</button>
+  </div>
+}
+
+@if(sitio(); as s){
+  <app-carrusel-pagina [sitio]="s" tipo="CARRUSEL_CONTACTOS" pagina="Contactos" />
+
+  <!-- ========== PÁGINA: CONTACTOS ========== -->
+  <section class="section container">
+    <div class="section-heading">
+      <span class="eyebrow">CONTACTOS</span>
+      <h1>Conversemos sobre<br>tu próximo hogar.</h1>
+      <p>{{s.configuracion.lema}}</p>
+    </div>
+
+    <div class="contact-grid">
+
+      <div class="contact-details">
+        @if(s.configuracion.telefono){
+          <div>
+            <span class="eyebrow">TELÉFONO</span>
+            <a [href]="contacto(s.configuracion.telefono)">{{s.configuracion.telefono}}</a>
+          </div>
+        }
+        @if(s.configuracion.correo){
+          <div>
+            <span class="eyebrow">CORREO</span>
+            <a [href]="contacto(s.configuracion.correo)">{{s.configuracion.correo}}</a>
+          </div>
+        }
+        @if(s.configuracion.direccion){
+          <div>
+            <span class="eyebrow">VISÍTANOS</span>
+            <p>{{s.configuracion.direccion}}</p>
+          </div>
+        }
+        @if(s.configuracion.horario){
+          <div>
+            <span class="eyebrow">HORARIO</span>
+            <p>{{s.configuracion.horario}}</p>
+          </div>
+        }
+        @if(s.configuracion.whatsapp){
+          <a class="btn" [href]="'https://wa.me/'+s.configuracion.whatsapp" target="_blank" rel="noopener noreferrer">Escríbenos por WhatsApp ↗</a>
+        }
+      </div>
+
+      <div class="map-panel">
+        @if(mapa){
+          <iframe [src]="mapa" title="Ubicación de nuestra oficina" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        }@else{
+          <div class="map-empty">
+            <span>⌖</span>
+            <h3>Encuéntranos</h3>
+            <p>{{s.configuracion.direccion||'Estamos cerca de tu próximo hogar.'}}</p>
+            @if(s.configuracion.mapa){
+              <a [href]="s.configuracion.mapa" class="btn" target="_blank" rel="noopener noreferrer">Abrir Google Maps ↗</a>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+
+  </section>
+
+}

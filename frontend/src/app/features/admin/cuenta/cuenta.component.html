@@ -1,0 +1,27 @@
+@if(error()){
+  <div class="alert error" role="alert">
+    {{error()}}
+    <button aria-label="Cerrar error" (click)="error.set('')">×</button>
+  </div>
+}
+@if(aviso()){
+  <div class="alert success" role="status">
+    {{aviso()}}
+    <button aria-label="Cerrar aviso" (click)="aviso.set('')">×</button>
+  </div>
+}
+
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">SEGURIDAD</span>
+    <h1>Mi cuenta</h1>
+    <p>{{sesion.usuario()?.nombre}} · {{sesion.usuario()?.email}}</p>
+  </div>
+</div>
+
+<form class="panel settings-form narrow" (ngSubmit)="cambiarClave()" #pf="ngForm">
+  <h2>Cambiar contraseña</h2>
+  <label>Contraseña actual<input name="actual" type="password" [(ngModel)]="claveActual" autocomplete="current-password" required></label>
+  <label>Nueva contraseña<input name="nueva" type="password" [(ngModel)]="claveNueva" required minlength="12" maxlength="72" autocomplete="new-password"><small>Mínimo 12 caracteres. Al guardar, debes iniciar sesión nuevamente.</small></label>
+  <button class="btn" [disabled]="pf.invalid">Actualizar contraseña</button>
+</form>

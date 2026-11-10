@@ -1,0 +1,92 @@
+@if(cargando()){
+  <div class="loading" role="status"><span class="spinner"></span>Cargando…</div>
+}
+
+@if(error()){
+  <div class="alert error" role="alert">
+    {{error()}}
+    <button aria-label="Cerrar error" (click)="error.set('')">×</button>
+  </div>
+}
+@if(aviso()){
+  <div class="alert success" role="status">
+    {{aviso()}}
+    <button aria-label="Cerrar aviso" (click)="aviso.set('')">×</button>
+  </div>
+}
+
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">ACCESOS A LA PLATAFORMA</span>
+    <h1>Usuarios y roles</h1>
+    <p>El operador gestiona contenido. El administrador también gestiona usuarios.</p>
+  </div>
+  <button class="btn" (click)="editarUsuario()">＋ Nuevo usuario</button>
+</div>
+
+<div class="panel table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for(u of usuarios(); track u.id){
+        <tr>
+          <td>
+            <strong>{{u.nombre}}</strong>
+            <small class="block muted">{{u.email}}</small>
+          </td>
+          <td>{{u.rol==='ADMINISTRADOR'?'Administrador':'Operador'}}</td>
+          <td>
+            <span class="status-chip" [class.hidden-chip]="!u.activo">{{u.activo?'Activo':'Inactivo'}}</span>
+          </td>
+          <td>
+            <div class="row-actions">
+              <button (click)="editarUsuario(u)">Editar</button>
+              <button class="danger-text" (click)="borrarUsuario(u)" [disabled]="u.id===sesion.usuario()?.id">Eliminar</button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ MODAL: EDITOR DE USUARIO ============ -->
+@if(usuarioEdicion; as u){
+  <div class="modal-backdrop">
+    <section class="editor-sheet" role="dialog" aria-modal="true" aria-labelledby="usuario-titulo">
+      <header>
+        <h2 id="usuario-titulo">{{u.id?'Editar usuario':'Nuevo usuario'}}</h2>
+        <button class="icon-btn" (click)="usuarioEdicion=null" [disabled]="false" aria-label="Cerrar">×</button>
+      </header>
+
+      <form (ngSubmit)="guardarUsuario()" #uf="ngForm">
+        <div class="editor-body">
+          <label>Nombre<input name="nombre" [(ngModel)]="u.nombre" required maxlength="100"></label>
+          <label>Correo<input name="email" type="email" email [(ngModel)]="u.email" required maxlength="180" autocomplete="off"></label>
+          <label>{{u.id?'Nueva contraseña (opcional)':'Contraseña inicial'}}<input name="clave" type="password" [(ngModel)]="u.clave" [required]="!u.id" minlength="12" maxlength="72" autocomplete="new-password"><small>{{u.id?'Déjala vacía para mantener la actual.':'Mínimo 12 caracteres.'}}</small></label>
+          <label>Rol
+            <select name="rol" [(ngModel)]="u.rol" required>
+              <option value="OPERADOR">Operador: gestiona contenidos</option>
+              <option value="ADMINISTRADOR">Administrador: control total</option>
+            </select>
+          </label>
+          <label class="checkbox"><input name="activo" type="checkbox" [(ngModel)]="u.activo"> Cuenta activa</label>
+
+          <p class="helper">Cambiar un usuario cierra sus sesiones anteriores. Si editas tu cuenta, deberás iniciar sesión nuevamente.</p>
+        </div>
+
+        <footer class="editor-footer">
+          <button class="btn secondary" type="button" (click)="usuarioEdicion=null">Cancelar</button>
+          <button class="btn" [disabled]="uf.invalid">Guardar usuario</button>
+        </footer>
+      </form>
+    </section>
+  </div>
+}

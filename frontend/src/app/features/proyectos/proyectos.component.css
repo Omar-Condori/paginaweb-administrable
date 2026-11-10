@@ -1,0 +1,6 @@
+/* Proyectos Component Styles */
+:host {
+  display: block;
+}
+
+/* Uses shared styles from layout.component.css */

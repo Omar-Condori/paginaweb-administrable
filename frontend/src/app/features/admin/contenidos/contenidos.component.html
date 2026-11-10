@@ -1,0 +1,263 @@
+@if(cargando()){
+  <div class="loading" role="status"><span class="spinner"></span>Cargando información…</div>
+}
+
+@if(error()){
+  <div class="alert error sticky-alert" role="alert">
+    {{error()}}
+    <button aria-label="Cerrar error" (click)="error.set('')">×</button>
+  </div>
+}
+@if(aviso()){
+  <div class="alert success" role="status">
+    {{aviso()}}
+    <button aria-label="Cerrar aviso" (click)="aviso.set('')">×</button>
+  </div>
+}
+
+@if(sitio(); as sitioActual){
+
+  <!-- ========== VISTA: CONTENIDO ========== -->
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">PÁGINA {{paginaActual()}}</span>
+      <h1>{{nombreTipo()}}</h1>
+      <p>{{esTarjeta() ? 'Edita el encabezado y administra las tarjetas de misión, visión y valores.' : tipo()==='CASA_MODELO'?'Edita la imagen de fondo y la tarjeta flotante.':'Administra las imágenes y los textos de esta sección.'}}</p>
+    </div>
+    <button class="btn" (click)="editar()" [disabled]="!puedeCrear()||guardando()">＋ {{esTarjeta() ? 'Nueva tarjeta' : 'Nuevo contenido'}}</button>
+  </div>
+
+  @if(seccionEdicion;as s){
+      <details class="panel heading-editor" [open]="esTarjeta()">
+        <summary>Encabezado y visibilidad de la sección</summary>
+        <form (ngSubmit)="guardarSeccion()" #sf="ngForm">
+          <div class="form-grid">
+            <label>Título<input name="titulo" [(ngModel)]="s.titulo" required maxlength="160"></label>
+            <label>Subtítulo<input name="subtitulo" [(ngModel)]="s.subtitulo" maxlength="240"></label>
+          </div>
+          <div class="form-actions">
+            <label class="checkbox"><input name="visible" type="checkbox" [(ngModel)]="s.activo"> Mostrar sección en Inicio</label>
+            <button class="btn small" [disabled]="sf.invalid||guardando()">Guardar encabezado</button>
+          </div>
+        </form>
+      </details>
+  }
+
+  <div class="panel table-panel">
+    <div class="table-heading">
+      <h2>Contenidos <span class="count">{{lista().length}}</span></h2>
+      <span class="muted">Se muestran de menor a mayor orden</span>
+    </div>
+
+    @if(lista().length===0){
+      <div class="empty-state">
+        <span>▧</span>
+        <h3>Tu próxima historia empieza aquí</h3>
+        <p>Agrega el primer contenido de esta sección.</p>
+        <button class="btn" (click)="editar()">Crear contenido</button>
+      </div>
+    }@else{
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Contenido</th>
+              <th>Orden</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(c of lista(); track c.id){
+              <tr>
+                <td>
+                  <div class="table-item">
+                    @if(!esTarjeta()){
+                    <div class="thumbnail-preview">
+                      @if(imagenesFallidas().has(c.imagen)){
+                        <span class="missing-thumbnail">Imagen no disponible</span>
+                      }@else{
+                        <img [src]="c.imagen" [alt]="c.titulo" (error)="marcarImagenFallida(c.imagen)">
+                      }
+                      <button type="button" class="preview-eye" (click)="ampliarImagen(c)" [attr.aria-label]="'Ampliar foto de ' + c.titulo" title="Ampliar fotografía">
+                        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </button>
+                    </div>
+                    }
+                    <div>
+                      <strong>{{c.titulo}}</strong>
+                      <small>{{esTarjeta() ? c.descripcion : c.subtitulo||c.cargo}}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="order-actions">
+                    <button class="order-btn" (click)="reordenar(c, 'up')" [disabled]="guardando() || c.orden === 0" aria-label="Subir">▲</button>
+                    <span class="order-num">{{c.orden}}</span>
+                    <button class="order-btn" (click)="reordenar(c, 'down')" [disabled]="guardando() || c.orden === (lista().length - 1)" aria-label="Bajar">▼</button>
+                  </div>
+                </td>
+                <td>
+                  <button class="status-chip" [class.hidden-chip]="!c.activo" (click)="estado(c)" [disabled]="guardando()">{{c.activo?'Publicado':'Oculto'}}</button>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button (click)="editar(c)" [disabled]="guardando()">Editar</button>
+                    <button class="danger-text" (click)="borrar(c)" [disabled]="guardando()">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+}
+
+<!-- ============ MODAL: EDITOR DE CONTENIDO ============ -->
+@if(edicion; as c){
+  <div class="modal-backdrop">
+    <section class="editor-sheet" role="dialog" aria-modal="true" aria-labelledby="editor-titulo">
+      <header>
+        <div>
+          <span class="eyebrow">{{nombreTipo()}}</span>
+          <h2 id="editor-titulo">{{esTarjeta() ? (c.id ? 'Editar tarjeta' : 'Nueva tarjeta') : (c.id?'Editar contenido':'Nuevo contenido')}}</h2>
+        </div>
+        <button class="icon-btn" (click)="edicion=null" [disabled]="guardando()||subiendo()" aria-label="Cerrar editor">×</button>
+      </header>
+
+      <form (ngSubmit)="guardarContenido()" #ef="ngForm">
+        <div class="editor-body">
+          @if(error()){
+            <p class="alert error" role="alert">{{error()}}</p>
+          }
+
+          @if(esTarjeta()){
+            <label>Título de la tarjeta<input name="tituloTarjeta" [(ngModel)]="c.titulo" required maxlength="160" autofocus></label>
+            <label>Descripción<textarea name="descripcionTarjeta" [(ngModel)]="c.descripcion" required rows="7" maxlength="6000"></textarea></label>
+            <div class="form-grid">
+              <label>Orden de aparición<input name="ordenTarjeta" type="number" [(ngModel)]="c.orden" required min="0" max="10000"></label>
+              <label class="checkbox"><input name="activoTarjeta" type="checkbox" [(ngModel)]="c.activo"> Publicado en el sitio</label>
+            </div>
+          }@else if(esCarrusel()){
+            <label>Título<input name="titulo" [(ngModel)]="c.titulo" required maxlength="160" autofocus></label>
+            <label>Subtítulo<input name="subtitulo" [(ngModel)]="c.subtitulo" maxlength="240"></label>
+
+            <!-- Imagen principal (Carrusel) -->
+            <div class="image-picker">
+              <label>Fotografía
+                <select name="imagen" [(ngModel)]="c.imagen" required>
+                  <option value="">Seleccionar de la biblioteca</option>
+                  @if(c.imagen.startsWith('/ejemplos/')){
+                    <option [value]="c.imagen">Imagen de ejemplo actual</option>
+                  }
+                  @for(a of archivos(); track a.nombre){
+                    <option [value]="a.url">{{a.original}}</option>
+                  }
+                </select>
+              </label>
+              @if(c.imagen){
+                <img [src]="c.imagen" alt="Vista previa de imagen">
+              }
+              <label class="upload-drop">{{subiendo()?'Subiendo…':'↑ Subir una nueva imagen'}}<input type="file" accept="image/png,image/jpeg" (change)="subir($event,'imagen')" [disabled]="subiendo()||guardando()"><small>JPG o PNG, hasta 8 MB</small></label>
+            </div>
+            <div class="form-grid">
+              <label>Orden de aparición<input name="ordenCarrusel" type="number" [(ngModel)]="c.orden" required min="0" max="10000"></label>
+              <label class="checkbox"><input name="activoCarrusel" type="checkbox" [(ngModel)]="c.activo"> Publicado en el sitio</label>
+            </div>
+          }@else{
+            <label>{{tipo()==='VENTAS'?'Nombre':tipo()==='TESTIMONIO'?'Nombre del cliente':'Título'}}<input name="titulo" [(ngModel)]="c.titulo" required maxlength="160" autofocus></label>
+            <label>Subtítulo<input name="subtitulo" [(ngModel)]="c.subtitulo" maxlength="240"></label>
+            <label>{{tipo()==='TESTIMONIO'?'Testimonio':'Descripción'}}<textarea name="descripcion" [(ngModel)]="c.descripcion" rows="4" maxlength="6000"></textarea></label>
+
+            <!-- Imagen principal -->
+            <div class="image-picker">
+              <label>{{tipo()==='CASA_MODELO'?'Imagen de fondo':'Fotografía'}}
+                <select name="imagen" [(ngModel)]="c.imagen" required>
+                  <option value="">Seleccionar de la biblioteca</option>
+                  @if(c.imagen.startsWith('/ejemplos/')){
+                    <option [value]="c.imagen">Imagen de ejemplo actual</option>
+                  }
+                  @for(a of archivos(); track a.nombre){
+                    <option [value]="a.url">{{a.original}}</option>
+                  }
+                </select>
+              </label>
+              @if(c.imagen){
+                <img [src]="c.imagen" alt="Vista previa de imagen">
+              }
+              <label class="upload-drop">{{subiendo()?'Subiendo…':'↑ Subir una nueva imagen'}}<input type="file" accept="image/png,image/jpeg" (change)="subir($event,'imagen')" [disabled]="subiendo()||guardando()"><small>JPG o PNG, hasta 8 MB</small></label>
+            </div>
+
+            <!-- Imagen secundaria (solo Casa modelo) -->
+            @if(tipo()==='CASA_MODELO'){
+              <div class="image-picker">
+                <label>Fotografía de la tarjeta flotante
+                  <select name="secundaria" [(ngModel)]="c.imagenSecundaria" required>
+                    <option value="">Seleccionar imagen</option>
+                    @if(c.imagenSecundaria.startsWith('/ejemplos/')){
+                      <option [value]="c.imagenSecundaria">Imagen de ejemplo actual</option>
+                    }
+                    @for(a of archivos(); track a.nombre){
+                      <option [value]="a.url">{{a.original}}</option>
+                    }
+                  </select>
+                </label>
+                @if(c.imagenSecundaria){
+                  <img [src]="c.imagenSecundaria" alt="Vista previa de la tarjeta">
+                }
+                <label class="upload-drop">↑ Subir fotografía de la tarjeta<input type="file" accept="image/png,image/jpeg" (change)="subir($event,'imagenSecundaria')" [disabled]="subiendo()||guardando()"></label>
+              </div>
+            }
+
+            <!-- Campos de Ventas -->
+            @if(tipo()==='VENTAS'){
+              <div class="form-grid">
+                <label>Contacto (teléfono o correo)<input name="contacto" [(ngModel)]="c.contacto" required maxlength="160"></label>
+                <label>Rol o cargo<input name="cargo" [(ngModel)]="c.cargo" required maxlength="100" placeholder="Asesora / Marketing"></label>
+              </div>
+            }
+
+            <!-- Campos de Testimonio -->
+            @if(tipo()==='TESTIMONIO'){
+              <label>Calificación
+                <select name="estrellas" [(ngModel)]="c.calificacion">
+                  <option [ngValue]="5">★★★★★ · 5</option>
+                  <option [ngValue]="4">★★★★☆ · 4</option>
+                  <option [ngValue]="3">★★★☆☆ · 3</option>
+                  <option [ngValue]="2">★★☆☆☆ · 2</option>
+                  <option [ngValue]="1">★☆☆☆☆ · 1</option>
+                </select>
+              </label>
+            }
+
+            <div class="form-grid">
+              <label>Orden de aparición<input name="orden" type="number" [(ngModel)]="c.orden" required min="0" max="10000"></label>
+              <label class="checkbox"><input name="activo" type="checkbox" [(ngModel)]="c.activo"> Publicado en el sitio</label>
+            </div>
+          }
+        </div>
+
+        <footer class="editor-footer">
+          <button type="button" class="btn secondary" (click)="edicion=null" [disabled]="guardando()||subiendo()">Cancelar</button>
+          <button class="btn" [disabled]="ef.invalid||guardando()||subiendo()">{{guardando()?'Guardando…':'Guardar contenido'}}</button>
+        </footer>
+      </form>
+    </section>
+  </div>
+}
+
+<dialog #visor class="image-viewer" (cancel)="cerrarImagen()" (click)="$event.target === visor && cerrarImagen()">
+  @if(imagenAmpliada(); as foto){
+    <header>
+      <h2>{{foto.titulo}}</h2>
+      <button type="button" class="viewer-close" (click)="cerrarImagen()" aria-label="Cerrar fotografía" autofocus>×</button>
+    </header>
+    @if(imagenesFallidas().has(foto.url)){
+      <p class="viewer-error" role="alert">No se encontró esta fotografía. Edita el contenido para seleccionar una imagen de la biblioteca o subir la foto original.</p>
+    }@else{
+      <img [src]="foto.url" [alt]="foto.titulo" (error)="marcarImagenFallida(foto.url)">
+    }
+  }
+</dialog>

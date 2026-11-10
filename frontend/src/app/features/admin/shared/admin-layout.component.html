@@ -1,0 +1,87 @@
+<div class="admin-shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" [class.open]="menu()">
+    <a routerLink="/" class="brand light" target="_blank" rel="noopener">
+      <img src="/assets/images/prohabit.png" alt="PROHABIT" class="brand-logo" />
+    </a>
+
+    <button class="sidebar-link" [class.selected]="vista()==='panel'" (click)="ir('panel')">
+      <span>▦</span> Panel
+    </button>
+
+    <span class="sidebar-label">CONTENIDO DEL SITIO</span>
+    <button type="button" class="sidebar-link group-toggle" [class.group-active]="grupoActual() === 'INICIO'" [attr.aria-expanded]="desplegados().has('INICIO')" aria-controls="submenu-INICIO" (click)="alternarGrupo('INICIO')">
+      <span aria-hidden="true">◈</span>Inicio
+      <svg class="group-chevron" [class.expanded]="desplegados().has('INICIO')" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
+    </button>
+    <div class="sidebar-submenu" id="submenu-INICIO" [hidden]="!desplegados().has('INICIO')">
+      @for(s of seccionesInicio; track s.tipo){
+        <button type="button" class="sidebar-link submenu-link" [class.selected]="seleccionado(s.tipo)" [attr.aria-current]="seleccionado(s.tipo) ? 'page' : null" (click)="ir('contenido', s.tipo)">{{s.nombre}}</button>
+      }
+    </div>
+
+    <button type="button" class="sidebar-link group-toggle" [class.group-active]="grupoActual() === 'NOSOTROS'" [attr.aria-expanded]="desplegados().has('NOSOTROS')" aria-controls="submenu-NOSOTROS" (click)="alternarGrupo('NOSOTROS')">
+      <span aria-hidden="true">◈</span>Nosotros
+      <svg class="group-chevron" [class.expanded]="desplegados().has('NOSOTROS')" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
+    </button>
+    <div class="sidebar-submenu" id="submenu-NOSOTROS" [hidden]="!desplegados().has('NOSOTROS')">
+      <button type="button" class="sidebar-link submenu-link" [class.selected]="seleccionado('NOSOTROS')" [attr.aria-current]="seleccionado('NOSOTROS') ? 'page' : null" (click)="ir('contenido', 'NOSOTROS')">Contenido</button>
+      <button type="button" class="sidebar-link submenu-link" [class.selected]="seleccionado('CARRUSEL_NOSOTROS')" [attr.aria-current]="seleccionado('CARRUSEL_NOSOTROS') ? 'page' : null" (click)="ir('contenido', 'CARRUSEL_NOSOTROS')">Carrusel</button>
+      <button type="button" class="sidebar-link submenu-link" [class.selected]="seleccionado('NOSOTROS_VALORES')" [attr.aria-current]="seleccionado('NOSOTROS_VALORES') ? 'page' : null" (click)="ir('contenido', 'NOSOTROS_VALORES')">Visión y Misión</button>
+    </div>
+
+    <button type="button" class="sidebar-link group-toggle" [class.group-active]="grupoActual() === 'CONTACTOS'" [attr.aria-expanded]="desplegados().has('CONTACTOS')" aria-controls="submenu-CONTACTOS" (click)="alternarGrupo('CONTACTOS')">
+      <span aria-hidden="true">◈</span>Contactos
+      <svg class="group-chevron" [class.expanded]="desplegados().has('CONTACTOS')" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
+    </button>
+    <div class="sidebar-submenu" id="submenu-CONTACTOS" [hidden]="!desplegados().has('CONTACTOS')">
+      <button type="button" class="sidebar-link submenu-link" [class.selected]="vista() === 'configuracion'" [attr.aria-current]="vista() === 'configuracion' ? 'page' : null" (click)="ir('configuracion')">Información de contacto</button>
+      <button type="button" class="sidebar-link submenu-link" [class.selected]="seleccionado('CARRUSEL_CONTACTOS')" [attr.aria-current]="seleccionado('CARRUSEL_CONTACTOS') ? 'page' : null" (click)="ir('contenido', 'CARRUSEL_CONTACTOS')">Carrusel</button>
+    </div>
+
+    <span class="sidebar-label">CONFIGURACIÓN</span>
+    <button class="sidebar-link" [class.selected]="vista()==='imagenes'" (click)="ir('imagenes')">
+      <span>▧</span> Biblioteca de imágenes
+    </button>
+    <button class="sidebar-link" [class.selected]="vista()==='configuracion'" (click)="ir('configuracion')">
+      <span>⚙</span> Datos generales
+    </button>
+    @if(sesion.esAdmin()){
+      <button class="sidebar-link" [class.selected]="vista()==='usuarios'" (click)="ir('usuarios')">
+        <span>♙</span> Usuarios y roles
+      </button>
+    }
+    <button class="sidebar-link" [class.selected]="vista()==='cuenta'" (click)="ir('cuenta')">
+      <span>○</span> Mi cuenta
+    </button>
+
+    <div class="sidebar-bottom">
+      <a routerLink="/" target="_blank" rel="noopener">Ver sitio público ↗</a>
+      <button (click)="salir()" [disabled]="false">Cerrar sesión ↪</button>
+    </div>
+  </aside>
+
+  <!-- ============ CONTENIDO PRINCIPAL ============ -->
+  <div class="admin-main">
+
+    <header class="admin-topbar">
+      <button class="menu-toggle icon-btn" (click)="menu.set(!menu())" aria-label="Abrir menú">☰</button>
+      <span>Gestión <span class="muted">/ {{tituloVista()}}</span></span>
+      <div class="topbar-right">
+        <app-tema-toggle />
+        <div class="account-badge">
+          <span class="avatar">{{sesion.usuario()?.nombre?.charAt(0)}}</span>
+          <div>
+            <strong>{{sesion.usuario()?.nombre}}</strong>
+            <small>{{sesion.esAdmin()?'Administrador':'Operador'}}</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

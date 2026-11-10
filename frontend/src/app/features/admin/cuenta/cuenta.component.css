@@ -1,0 +1,9 @@
+/* Cuenta Component Styles */
+:host {
+  display: block;
+}
+
+/* Uses shared admin styles from admin-layout.component.css */
+.settings-form.narrow {
+  max-width: 400px;
+}

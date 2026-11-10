@@ -1,0 +1,51 @@
+@if(cargando()){
+  <div class="loading" role="status"><span class="spinner"></span>Cargando información…</div>
+}
+
+@if(!cargando()){
+
+  <!-- ========== VISTA: PANEL ========== -->
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">TU ESPACIO DE TRABAJO</span>
+      <h1>Hola, {{sesion.usuario()?.nombre}}.</h1>
+      <p>Tu sitio, siempre al día. ¿Qué quieres actualizar hoy?</p>
+    </div>
+    <a class="btn secondary" routerLink="/" target="_blank" rel="noopener">Ver sitio ↗</a>
+  </div>
+
+  <div class="stats-grid">
+    <article class="stat-card">
+      <span>Contenidos publicados</span>
+      <strong>{{publicados()}}</strong>
+      <small>Visibilidad de cada contenido</small>
+    </article>
+    <article class="stat-card">
+      <span>Proyectos</span>
+      <strong>{{cantidad('PROYECTO')}}</strong>
+      <small>Presentados dentro de Inicio</small>
+    </article>
+    <article class="stat-card">
+      <span>Imágenes guardadas</span>
+      <strong>{{archivos().length}}</strong>
+      <small>Disponibles para reutilizar</small>
+    </article>
+  </div>
+
+  <h2 class="admin-section-title">Accesos rápidos</h2>
+  <div class="quick-grid">
+    @for(s of secciones; track s.tipo){
+      <button class="quick-card" (click)="ir('contenido', s.tipo)">
+        <span class="quick-icon">{{s.tipo==='CARRUSEL'?'▧':s.tipo==='VENTAS'?'♙':'◈'}}</span>
+        <span><strong>{{s.nombre}}</strong><small>{{s.detalle}}</small></span>
+        <span>↗</span>
+      </button>
+    }
+  </div>
+
+  <div class="info-card">
+    <strong>Publicación directa</strong>
+    <p>Al guardar un contenido activo, aparece en el sitio público. Puedes ocultarlo, cambiar su orden o reutilizar imágenes desde la biblioteca.</p>
+  </div>
+
+}

@@ -1,0 +1,52 @@
+<main class="login-page">
+
+  <!-- Panel decorativo -->
+  <section class="login-art">
+    <a class="brand light" routerLink="/" aria-label="PROHABIT - Espacios para vivir">
+      <img class="brand-logo" src="assets/images/prohabit.png" alt="PROHABIT Espacios para vivir">
+    </a>
+    <div>
+      <span class="eyebrow">ADMINISTRACIÓN</span>
+      <h1>Tu contenido.<br>Una nueva historia.</h1>
+      <p>Todo lo que tus clientes ven, en un solo lugar.</p>
+    </div>
+    <span>Portal inmobiliario · Gestión de contenidos</span>
+  </section>
+
+  <!-- Formulario -->
+  <section class="login-form">
+    <a class="back-link" routerLink="/">← Volver al sitio</a>
+    <div>
+      <span class="eyebrow">BIENVENIDO</span>
+      <h2>Ingresa a tu espacio</h2>
+      <p class="muted">Acceso para administradores y operadores.</p>
+
+      <form (ngSubmit)="entrar()" #f="ngForm">
+        <label>Correo electrónico<input name="email" [(ngModel)]="email" type="email" required email autocomplete="username" placeholder="tu@empresa.com"></label>
+
+        <label>Contraseña
+          <span class="input-wrap">
+            <input name="clave" [(ngModel)]="clave" [type]="verClave() ? 'text' : 'password'" required autocomplete="current-password" placeholder="Tu contraseña">
+            <button type="button" class="toggle-password" (click)="toggleVerClave()" [attr.aria-label]="verClave() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              @if(!verClave()){
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              }@else{
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              }
+            </button>
+          </span>
+        </label>
+
+        @if(error()){
+          <p class="alert error" role="alert">{{error()}}</p>
+        }
+
+        <button class="btn full" [disabled]="f.invalid||ocupado()">{{ocupado()?'Ingresando…':'Iniciar sesión →'}}</button>
+      </form>
+
+      <p class="helper">Si necesitas acceso o restablecer tu contraseña, contacta al administrador de la plataforma.</p>
+    </div>
+  </section>
+
+</main>
+<app-tema-toggle [flotante]="true" />
