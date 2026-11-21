@@ -18,3 +18,14 @@
 .viewer-close { flex-shrink: 0; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #eef1f4; font-size: 28px; cursor: pointer; }
 .image-viewer > img { display: block; width: 100%; height: auto; max-height: calc(92dvh - 80px); object-fit: contain; background: #121923; }
 .viewer-error { padding: 20px; max-width: 600px; }
+
+/* ---- Galería de fotos adicionales (proyectos) ---- */
+.gallery-editor small { display: block; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+.gallery-item { position: relative; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #0001; }
+.gallery-item img { display: block; width: 100%; height: 78px; object-fit: cover; }
+.gallery-actions { display: flex; justify-content: space-between; gap: 2px; padding: 4px; }
+.gallery-actions button { flex: 1; min-height: 26px; padding: 0; border: 1px solid var(--line); border-radius: 5px; background: transparent; color: var(--ink); font-size: .72rem; cursor: pointer; }
+.gallery-actions button:hover:not(:disabled) { background: #1c479b18; }
+.gallery-actions button:disabled { opacity: .35; cursor: default; }
+.gallery-actions .gallery-remove { color: #c0392b; font-size: 1rem; line-height: 1; }

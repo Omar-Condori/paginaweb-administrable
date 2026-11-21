@@ -1,13 +1,13 @@
 import { CarruselPaginaComponent } from '../../shared/carrusel/carrusel.component';
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ProyectosService } from './proyectos.service';
 import { mensajeError } from '../../api';
+import { ProyectoCardComponent } from '../../shared/proyecto-card/proyecto-card.component';
 
 @Component({
   selector: 'app-proyectos',
-  imports: [RouterLink, CarruselPaginaComponent],
+  imports: [CarruselPaginaComponent, ProyectoCardComponent],
   templateUrl: './proyectos.component.html',
   styleUrl: './proyectos.component.css'
 })

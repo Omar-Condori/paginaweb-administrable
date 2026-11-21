@@ -1,4 +1,4 @@
-import { Component, inject, signal, HostListener, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, computed, inject, signal, HostListener, AfterViewInit, OnDestroy } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -22,6 +22,23 @@ export class LayoutComponent implements AfterViewInit, OnDestroy {
   menu = signal(false);
   scrolled = signal(false);
   mapa: SafeResourceUrl | null = null;
+
+  /** Marcas activas, solo si la sección está publicada. */
+  marcas = computed<any[]>(() => {
+    const s = this.sitio();
+    if (!s || !s.secciones?.find((x: any) => x.codigo === 'MARCAS')?.activo) return [];
+    return (s.contenidos || []).filter((c: any) => c.tipo === 'MARCAS' && c.activo && c.imagen);
+  });
+
+  /** Una mitad del carrusel: se repite la lista hasta cubrir el ancho y luego se duplica en la plantilla para el bucle infinito. */
+  pistaMarcas = computed<any[]>(() => {
+    const m = this.marcas();
+    if (!m.length) return [];
+    const veces = Math.max(1, Math.ceil(8 / m.length));
+    return Array.from({ length: veces }, () => m).flat();
+  });
+
+  tituloMarcas = computed<string>(() => this.sitio()?.secciones?.find((x: any) => x.codigo === 'MARCAS')?.titulo || '');
 
   ngAfterViewInit() {
     this.checkScroll();

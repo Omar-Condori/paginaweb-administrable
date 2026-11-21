@@ -24,9 +24,6 @@
 
 /* ---------- Base ---------- */
 :root[data-theme='dark'] .eyebrow { color: #d3b48a; }
-:root[data-theme='dark'] .btn { background: #2456b8; }
-:root[data-theme='dark'] .btn:hover { background: #1c479b; }
-:root[data-theme='dark'] .btn.cream { background: #f5ead6; color: #1c479b; }
 :root[data-theme='dark'] .btn.secondary { background: #1a1d24; color: #e5e8ee; border-color: #2c313b; }
 :root[data-theme='dark'] .alert.error { background: #3a1a1c; color: #ffb4b6; border-color: #5c2a2d; }
 :root[data-theme='dark'] .alert.success { background: #16301f; color: #a8e0b8; border-color: #234a31; }
@@ -43,10 +40,16 @@
 :root[data-theme='dark'] textarea::placeholder { color: #6c7686; }
 
 /* ---------- Encabezado y pie ---------- */
-:root[data-theme='dark'] .site-header.scrolled { background: #0d1830; }
 :root[data-theme='dark'] .site-header nav.open { background: #14171c; box-shadow: 0 15px 20px #0008; }
 :root[data-theme='dark'] .site-header nav.open a { color: #d5d9e2; }
-:root[data-theme='dark'] .site-footer { background: var(--ink-dark); }
+:root[data-theme='dark'] .site-footer {
+  --ink: #1c479b;
+  --ink-dark: #163a7d;
+  --text: #293a35;
+  --muted: #718079;
+  --line: #e3e7e2;
+  background: #163a7d; /* el pie conserva su azul del modo día */
+}
 
 /* ---------- Títulos de sección ---------- */
 :root[data-theme='dark'] .section-heading h2,
@@ -82,11 +85,20 @@
 :root[data-theme='dark'] .map-empty > span { color: #6c7686; }
 
 /* ---------- Panel de administración ---------- */
+/* El menú lateral conserva su azul y sus acentos dorados del modo día:
+   se restauran las variables de color solo dentro de la barra lateral. */
+:root[data-theme='dark'] .sidebar {
+  --ink: #1c479b;
+  --ink-dark: #163a7d;
+  --text: #293a35;
+  --muted: #718079;
+  --line: #e3e7e2;
+  --paper: #fff;
+  --cream: #f4f1e9;
+}
 :root[data-theme='dark'] .admin-shell { background: #0a0a0b; }
 :root[data-theme='dark'] .admin-topbar { background: #111318; border-color: #272b34; }
-:root[data-theme='dark'] .sidebar-link.selected { background: #1e2c4f; color: #dbe6ff; }
-:root[data-theme='dark'] .sidebar-link.selected > span { color: #9db8ff; }
-:root[data-theme='dark'] .avatar { background: #1d222b; color: #aab8c9; }
+:root[data-theme='dark'] .avatar { background: var(--gold); color: #1c479b; }
 :root[data-theme='dark'] .stat-card > span,
 :root[data-theme='dark'] .stat-card small,
 :root[data-theme='dark'] .quick-card small,

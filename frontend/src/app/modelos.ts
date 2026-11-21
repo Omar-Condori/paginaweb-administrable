@@ -11,7 +11,8 @@ export type Tipo =
   | 'CARRUSEL_NOSOTROS'
   | 'CARRUSEL_PROYECTOS'
   | 'CARRUSEL_CONTACTOS'
-  | 'NOSOTROS_VALORES';
+  | 'NOSOTROS_VALORES'
+  | 'MARCAS';
 
 export type Rol = 'ADMINISTRADOR' | 'OPERADOR';
 
@@ -31,6 +32,10 @@ export interface Contenido {
   orden: number;
   activo: boolean;
   version: number;
+  /** Solo proyectos */
+  estado: string;
+  fecha: string;
+  galeria: string[];
 }
 
 export interface Seccion {
@@ -87,11 +92,18 @@ export const secciones: { tipo: Tipo; nombre: string; detalle: string }[] = [
   { tipo: 'RECREACION',  nombre: 'Áreas recreacionales', detalle: 'Espacios para compartir en familia' },
   { tipo: 'TESTIMONIO',  nombre: 'Testimonios',          detalle: 'Fotografía, estrellas y opinión' },
   { tipo: 'VENTAS',      nombre: 'Área de ventas',       detalle: 'Equipo y datos de contacto' },
+  { tipo: 'MARCAS',      nombre: 'Marcas',              detalle: 'Logos del carrusel infinito sobre el pie de página' },
   { tipo: 'NOSOTROS',    nombre: 'Nosotros',             detalle: 'Presentación de tu empresa' },
   { tipo: 'NOSOTROS_VALORES', nombre: 'Visión y Misión', detalle: 'Tarjetas de misión, visión y valores' },
   { tipo: 'CARRUSEL_NOSOTROS', nombre: 'Carrusel de Nosotros', detalle: 'Fotografías de la página Nosotros' },
   { tipo: 'CARRUSEL_PROYECTOS', nombre: 'Carrusel de Proyectos', detalle: 'Fotografías de la página Proyectos' },
   { tipo: 'CARRUSEL_CONTACTOS', nombre: 'Carrusel de Contactos', detalle: 'Fotografías de la página Contactos' }
+];
+
+export const estadosProyecto: { valor: string; texto: string }[] = [
+  { valor: 'EN_EJECUCION', texto: 'En ejecución' },
+  { valor: 'TERMINADO',    texto: 'Terminado' },
+  { valor: 'PROXIMAMENTE', texto: 'Próximamente' }
 ];
 
 // ============ FUNCIONES ============
@@ -109,6 +121,9 @@ export function contenidoNuevo(tipo: Tipo): Contenido {
     calificacion: 5,
     orden: 0,
     activo: true,
-    version: 0
+    version: 0,
+    estado: '',
+    fecha: '',
+    galeria: []
   };
 }

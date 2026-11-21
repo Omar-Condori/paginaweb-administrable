@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { Sesion, mensajeError } from '../../../api';
-import { secciones, contenidoNuevo, Tipo } from '../../../modelos';
+import { secciones, contenidoNuevo, estadosProyecto, Tipo } from '../../../modelos';
 
 @Component({
   selector: 'app-contenidos',
@@ -19,6 +19,8 @@ export class ContenidosComponent implements OnInit, OnDestroy {
   sesion = inject(Sesion);
 
   secciones = secciones;
+  estadosProyecto = estadosProyecto;
+  readonly maxFotosExtra = 11;
   sitio = signal<any | null>(null);
   archivos = signal<any[]>([]);
   tipo = signal<Tipo>('CARRUSEL');
@@ -97,6 +99,8 @@ export class ContenidosComponent implements OnInit, OnDestroy {
     }
   }
 
+  esMarca() { return this.tipo() === 'MARCAS'; }
+
   esTarjeta() { return this.tipo() === 'NOSOTROS_VALORES'; }
 
   esCarrusel() {
@@ -105,6 +109,7 @@ export class ContenidosComponent implements OnInit, OnDestroy {
 
   paginaActual() {
     if (this.tipo() === 'NOSOTROS' || this.tipo() === 'CARRUSEL_NOSOTROS' || this.esTarjeta()) return 'NOSOTROS';
+    if (this.esMarca()) return 'TODAS LAS PÁGINAS';
     if (this.tipo() === 'CARRUSEL_PROYECTOS') return 'PROYECTOS';
     if (this.tipo() === 'CARRUSEL_CONTACTOS') return 'CONTACTOS';
     return 'INICIO';
@@ -127,7 +132,7 @@ export class ContenidosComponent implements OnInit, OnDestroy {
   }
 
   puedeCrear() {
-    return !['CASA_MODELO', 'NOSOTROS'].includes(this.tipo()) || this.lista().length === 0;
+    return this.tipo() !== 'NOSOTROS' || this.lista().length === 0;
   }
 
   async operacion(fn: () => Promise<unknown>, texto: string) {
@@ -146,12 +151,23 @@ export class ContenidosComponent implements OnInit, OnDestroy {
 
   editar(c?: any) {
     this.error.set('');
-    this.edicion = c ? { ...c } : { ...contenidoNuevo(this.tipo()), orden: Math.max(-1, ...this.lista().map((item: any) => item.orden)) + 1 };
+    this.edicion = c
+      ? { ...c, estado: c.estado || '', fecha: c.fecha || '', galeria: [...(c.galeria || [])] }
+      : { ...contenidoNuevo(this.tipo()), orden: Math.max(-1, ...this.lista().map((item: any) => item.orden)) + 1 };
   }
 
   async guardarContenido() {
     const c = this.edicion;
     if (!c) return;
+    if (this.tipo() === 'CASA_MODELO') c.imagenSecundaria = '';
+    if (this.esMarca()) {
+      c.subtitulo = '';
+      c.descripcion = '';
+      c.imagenSecundaria = '';
+      c.contacto = '';
+      c.cargo = '';
+      c.calificacion = 5;
+    }
     if (this.esCarrusel()) {
       c.descripcion = '';
       c.imagenSecundaria = '';
@@ -238,6 +254,59 @@ export class ContenidosComponent implements OnInit, OnDestroy {
       this.subiendo.set(false);
       input.value = '';
     }
+  }
+
+  /** Sube varias fotografías a la vez y las agrega a la galería del proyecto. */
+  async subirGaleria(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files || []);
+    if (!files.length || !this.edicion) return;
+    const cupo = this.maxFotosExtra - this.edicion.galeria.length;
+    if (files.length > cupo) {
+      this.error.set(cupo > 0 ? `Solo puedes agregar ${cupo} foto(s) más a este proyecto.` : 'Ya alcanzaste el máximo de fotografías del proyecto.');
+      input.value = '';
+      return;
+    }
+    if (files.some(f => f.size > 8 * 1024 * 1024)) {
+      this.error.set('Alguna imagen supera 8 MB.');
+      input.value = '';
+      return;
+    }
+    this.subiendo.set(true);
+    this.error.set('');
+    try {
+      for (const file of files) {
+        const form = new FormData();
+        form.append('archivo', file);
+        const a = await firstValueFrom(this.http.post<any>('/api/admin/archivos', form));
+        this.archivos.update(v => [a, ...v]);
+        this.edicion.galeria.push(a.url);
+      }
+      this.aviso.set(files.length === 1 ? 'Foto agregada al proyecto.' : `${files.length} fotos agregadas al proyecto.`);
+    } catch (e) {
+      this.error.set(mensajeError(e));
+    } finally {
+      this.subiendo.set(false);
+      input.value = '';
+    }
+  }
+
+  agregarDeBiblioteca(url: string, select: HTMLSelectElement) {
+    if (url && this.edicion && this.edicion.galeria.length < this.maxFotosExtra && !this.edicion.galeria.includes(url)) {
+      this.edicion.galeria.push(url);
+    }
+    select.value = '';
+  }
+
+  quitarFoto(i: number) {
+    this.edicion?.galeria.splice(i, 1);
+  }
+
+  moverFoto(i: number, delta: number) {
+    const g: string[] | undefined = this.edicion?.galeria;
+    const j = i + delta;
+    if (!g || j < 0 || j >= g.length) return;
+    [g[i], g[j]] = [g[j], g[i]];
   }
 
   async borrarImagen(a: any) {

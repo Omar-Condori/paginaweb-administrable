@@ -22,9 +22,9 @@
     <div>
       <span class="eyebrow">PÁGINA {{paginaActual()}}</span>
       <h1>{{nombreTipo()}}</h1>
-      <p>{{esTarjeta() ? 'Edita el encabezado y administra las tarjetas de misión, visión y valores.' : tipo()==='CASA_MODELO'?'Edita la imagen de fondo y la tarjeta flotante.':'Administra las imágenes y los textos de esta sección.'}}</p>
+      <p>{{esMarca() ? 'Sube el logo y el nombre de cada marca. Se muestran en un carrusel infinito sobre el pie de todas las páginas.' : esTarjeta() ? 'Edita el encabezado y administra las tarjetas de misión, visión y valores.' : tipo()==='CASA_MODELO'?'Agrega las fotos de la casa modelo. Cada una se muestra con su título y descripción, y se cambian con las flechas.':'Administra las imágenes y los textos de esta sección.'}}</p>
     </div>
-    <button class="btn" (click)="editar()" [disabled]="!puedeCrear()||guardando()">＋ {{esTarjeta() ? 'Nueva tarjeta' : 'Nuevo contenido'}}</button>
+    <button class="btn" (click)="editar()" [disabled]="!puedeCrear()||guardando()">＋ {{esTarjeta() ? 'Nueva tarjeta' : esMarca() ? 'Nueva marca' : 'Nuevo contenido'}}</button>
   </div>
 
   @if(seccionEdicion;as s){
@@ -36,7 +36,7 @@
             <label>Subtítulo<input name="subtitulo" [(ngModel)]="s.subtitulo" maxlength="240"></label>
           </div>
           <div class="form-actions">
-            <label class="checkbox"><input name="visible" type="checkbox" [(ngModel)]="s.activo"> Mostrar sección en Inicio</label>
+            <label class="checkbox"><input name="visible" type="checkbox" [(ngModel)]="s.activo"> {{esMarca() ? 'Mostrar el carrusel de marcas en todas las páginas' : 'Mostrar sección en Inicio'}}</label>
             <button class="btn small" [disabled]="sf.invalid||guardando()">Guardar encabezado</button>
           </div>
         </form>
@@ -122,7 +122,7 @@
       <header>
         <div>
           <span class="eyebrow">{{nombreTipo()}}</span>
-          <h2 id="editor-titulo">{{esTarjeta() ? (c.id ? 'Editar tarjeta' : 'Nueva tarjeta') : (c.id?'Editar contenido':'Nuevo contenido')}}</h2>
+          <h2 id="editor-titulo">{{esTarjeta() ? (c.id ? 'Editar tarjeta' : 'Nueva tarjeta') : esMarca() ? (c.id ? 'Editar marca' : 'Nueva marca') : (c.id?'Editar contenido':'Nuevo contenido')}}</h2>
         </div>
         <button class="icon-btn" (click)="edicion=null" [disabled]="guardando()||subiendo()" aria-label="Cerrar editor">×</button>
       </header>
@@ -139,6 +139,27 @@
             <div class="form-grid">
               <label>Orden de aparición<input name="ordenTarjeta" type="number" [(ngModel)]="c.orden" required min="0" max="10000"></label>
               <label class="checkbox"><input name="activoTarjeta" type="checkbox" [(ngModel)]="c.activo"> Publicado en el sitio</label>
+            </div>
+          }@else if(esMarca()){
+            <label>Nombre de la marca<input name="tituloMarca" [(ngModel)]="c.titulo" required maxlength="160" autofocus></label>
+
+            <div class="image-picker">
+              <label>Logo
+                <select name="imagenMarca" [(ngModel)]="c.imagen" required>
+                  <option value="">Seleccionar de la biblioteca</option>
+                  @for(a of archivos(); track a.nombre){
+                    <option [value]="a.url">{{a.original}}</option>
+                  }
+                </select>
+              </label>
+              @if(c.imagen){
+                <img [src]="c.imagen" alt="Vista previa del logo">
+              }
+              <label class="upload-drop">{{subiendo()?'Subiendo…':'↑ Subir un nuevo logo'}}<input type="file" accept="image/png,image/jpeg" (change)="subir($event,'imagen')" [disabled]="subiendo()||guardando()"><small>PNG con fondo transparente recomendado, hasta 8 MB</small></label>
+            </div>
+            <div class="form-grid">
+              <label>Orden de aparición<input name="ordenMarca" type="number" [(ngModel)]="c.orden" required min="0" max="10000"></label>
+              <label class="checkbox"><input name="activoMarca" type="checkbox" [(ngModel)]="c.activo"> Publicado en el sitio</label>
             </div>
           }@else if(esCarrusel()){
             <label>Título<input name="titulo" [(ngModel)]="c.titulo" required maxlength="160" autofocus></label>
@@ -168,12 +189,12 @@
             </div>
           }@else{
             <label>{{tipo()==='VENTAS'?'Nombre':tipo()==='TESTIMONIO'?'Nombre del cliente':'Título'}}<input name="titulo" [(ngModel)]="c.titulo" required maxlength="160" autofocus></label>
-            <label>Subtítulo<input name="subtitulo" [(ngModel)]="c.subtitulo" maxlength="240"></label>
+            <label>{{(tipo()==='PROYECTO' || tipo()==='CASA_MODELO') ? 'Ubicación (ciudad o distrito)' : 'Subtítulo'}}<input name="subtitulo" [(ngModel)]="c.subtitulo" maxlength="240" [placeholder]="tipo()==='PROYECTO' ? 'Juliaca' : tipo()==='CASA_MODELO' ? 'La Molina' : ''"></label>
             <label>{{tipo()==='TESTIMONIO'?'Testimonio':'Descripción'}}<textarea name="descripcion" [(ngModel)]="c.descripcion" rows="4" maxlength="6000"></textarea></label>
 
             <!-- Imagen principal -->
             <div class="image-picker">
-              <label>{{tipo()==='CASA_MODELO'?'Imagen de fondo':'Fotografía'}}
+              <label>Fotografía
                 <select name="imagen" [(ngModel)]="c.imagen" required>
                   <option value="">Seleccionar de la biblioteca</option>
                   @if(c.imagen.startsWith('/ejemplos/')){
@@ -190,25 +211,55 @@
               <label class="upload-drop">{{subiendo()?'Subiendo…':'↑ Subir una nueva imagen'}}<input type="file" accept="image/png,image/jpeg" (change)="subir($event,'imagen')" [disabled]="subiendo()||guardando()"><small>JPG o PNG, hasta 8 MB</small></label>
             </div>
 
-            <!-- Imagen secundaria (solo Casa modelo) -->
-            @if(tipo()==='CASA_MODELO'){
-              <div class="image-picker">
-                <label>Fotografía de la tarjeta flotante
-                  <select name="secundaria" [(ngModel)]="c.imagenSecundaria" required>
-                    <option value="">Seleccionar imagen</option>
-                    @if(c.imagenSecundaria.startsWith('/ejemplos/')){
-                      <option [value]="c.imagenSecundaria">Imagen de ejemplo actual</option>
+            <!-- Proyectos: estado, fecha y fotografías adicionales -->
+            @if(tipo()==='PROYECTO'){
+              <div class="form-grid">
+                <label>Estado del proyecto
+                  <select name="estadoProyecto" [(ngModel)]="c.estado">
+                    <option value="">Sin estado</option>
+                    @for(e of estadosProyecto; track e.valor){
+                      <option [value]="e.valor">{{e.texto}}</option>
                     }
+                  </select>
+                </label>
+                <label>Fecha<input name="fechaProyecto" type="date" [(ngModel)]="c.fecha"></label>
+              </div>
+
+              <div class="image-picker gallery-editor">
+                <label>Fotos adicionales del proyecto
+                  <small>{{c.galeria.length}} de {{maxFotosExtra}} · se muestran junto a la fotografía principal, en el orden de abajo</small>
+                </label>
+                @if(c.galeria.length){
+                  <div class="gallery-grid">
+                    @for(f of c.galeria; track $index; let i = $index){
+                      <div class="gallery-item">
+                        <img [src]="f" [alt]="'Foto adicional ' + (i + 1)">
+                        <div class="gallery-actions">
+                          <button type="button" (click)="moverFoto(i,-1)" [disabled]="i===0" aria-label="Mover a la izquierda">◀</button>
+                          <button type="button" (click)="moverFoto(i,1)" [disabled]="i===c.galeria.length-1" aria-label="Mover a la derecha">▶</button>
+                          <button type="button" class="gallery-remove" (click)="quitarFoto(i)" aria-label="Quitar foto">×</button>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+                @if(archivos().length){
+                  <select #bib (change)="agregarDeBiblioteca(bib.value, bib)" aria-label="Agregar una foto de la biblioteca" [disabled]="c.galeria.length >= maxFotosExtra">
+                    <option value="">Agregar una foto de la biblioteca…</option>
                     @for(a of archivos(); track a.nombre){
                       <option [value]="a.url">{{a.original}}</option>
                     }
                   </select>
-                </label>
-                @if(c.imagenSecundaria){
-                  <img [src]="c.imagenSecundaria" alt="Vista previa de la tarjeta">
                 }
-                <label class="upload-drop">↑ Subir fotografía de la tarjeta<input type="file" accept="image/png,image/jpeg" (change)="subir($event,'imagenSecundaria')" [disabled]="subiendo()||guardando()"></label>
+                <label class="upload-drop">{{subiendo()?'Subiendo…':'↑ Subir una o varias fotos'}}<input type="file" accept="image/png,image/jpeg" multiple (change)="subirGaleria($event)" [disabled]="subiendo()||guardando()||c.galeria.length >= maxFotosExtra"><small>Puedes seleccionar varias a la vez · JPG o PNG, hasta 8 MB cada una</small></label>
               </div>
+            }
+
+            <!-- Casa modelo: etiqueta sobre la foto -->
+            @if(tipo()==='CASA_MODELO'){
+              <label>Etiqueta sobre la foto
+                <input name="etiqueta" [(ngModel)]="c.cargo" maxlength="100" placeholder="Hogar">
+              </label>
             }
 
             <!-- Campos de Ventas -->

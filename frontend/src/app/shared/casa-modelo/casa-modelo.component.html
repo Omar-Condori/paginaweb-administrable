@@ -1,0 +1,58 @@
+<section class="cm" aria-roledescription="carrusel" aria-label="Casa modelo">
+  <!-- Fondo: la misma foto, oscurecida y desenfocada -->
+  <div class="cm-bg" aria-hidden="true">
+    @for(c of items(); track c.id; let i = $index){
+      <img class="cm-bg-img" [class.activa]="i === actual()" [src]="foto(c)" alt="" loading="lazy">
+    }
+  </div>
+
+  <!-- Título y subtítulo centrados -->
+  <header class="cm-head">
+    <span class="cm-pill">{{seccion()?.titulo}}</span>
+    <h2>{{seccion()?.subtitulo}}</h2>
+    <span class="cm-rule"></span>
+  </header>
+
+  <div class="cm-wrap">
+    @if(items().length > 1){
+      <button type="button" class="cm-arrow cm-arrow--prev" (click)="mover(-1)" aria-label="Foto anterior">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
+    }
+
+    <div class="cm-stage">
+      <!-- Foto grande -->
+      <div class="cm-photo">
+        @for(c of items(); track c.id; let i = $index){
+          <figure class="cm-photo-slide" [class.activa]="i === actual()" [attr.aria-hidden]="i === actual() ? null : 'true'">
+            <img [src]="foto(c)" [alt]="c.titulo" loading="lazy">
+            <span class="cm-etiqueta">{{c.cargo || 'Hogar'}}</span>
+            <span class="cm-banda">{{c.titulo}}</span>
+          </figure>
+        }
+        <span class="cm-cuadro" aria-hidden="true"></span>
+      </div>
+
+      <!-- Tarjeta de texto: cada diapositiva se apila y solo la activa se ve -->
+      <article class="cm-card" aria-live="polite">
+        @for(c of items(); track c.id; let i = $index){
+          <div class="cm-card-slide" [class.activa]="i === actual()" [attr.aria-hidden]="i === actual() ? null : 'true'">
+            @if(c.subtitulo){<span class="cm-lugar">{{c.subtitulo}}</span>}
+            <div class="cm-fila">
+              <h3>{{c.titulo}}</h3>
+              <span class="cm-badge">{{seccion()?.subtitulo}}</span>
+            </div>
+            <p>{{c.descripcion}}</p>
+            <a class="cm-enlace" routerLink="/contactos" [attr.tabindex]="i === actual() ? null : -1">Agenda una visita <span aria-hidden="true">↗</span></a>
+          </div>
+        }
+      </article>
+    </div>
+
+    @if(items().length > 1){
+      <button type="button" class="cm-arrow cm-arrow--next" (click)="mover(1)" aria-label="Foto siguiente">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+      </button>
+    }
+  </div>
+</section>

@@ -16,7 +16,7 @@ export class AdminLayoutComponent {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   sesion = inject(Sesion);
-  seccionesInicio = secciones.filter(s => ['CARRUSEL', 'PROYECTO', 'CASA_MODELO', 'RECREACION', 'TESTIMONIO', 'VENTAS'].includes(s.tipo));
+  seccionesInicio = secciones.filter(s => ['CARRUSEL', 'PROYECTO', 'CASA_MODELO', 'RECREACION', 'TESTIMONIO', 'VENTAS', 'MARCAS'].includes(s.tipo));
   menu = signal(false);
   vista = signal('panel');
   tipoActual = signal('');

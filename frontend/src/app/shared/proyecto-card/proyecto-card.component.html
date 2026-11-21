@@ -1,0 +1,34 @@
+<article class="pc">
+  <div class="pc-media" role="group" aria-roledescription="carrusel de fotos" [attr.aria-label]="'Fotos de ' + proyecto().titulo">
+    @for(f of fotos(); track f; let i = $index){
+      <img class="pc-img" [class.activa]="i === indice()" [src]="f" [alt]="proyecto().titulo + ' — foto ' + (i + 1)" loading="lazy" draggable="false">
+    }
+
+    @if(estadoTexto()){
+      <span class="pc-estado" [attr.data-estado]="proyecto().estado">{{estadoTexto()}}</span>
+    }
+
+    <span class="pc-count" [attr.aria-label]="fotos().length + ' fotografías'">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.6"/></svg>
+      {{fotos().length}}
+    </span>
+
+    @if(fotos().length > 1){
+      <button type="button" class="pc-nav pc-prev" (click)="mover(-1)" aria-label="Foto anterior">‹</button>
+      <button type="button" class="pc-nav pc-next" (click)="mover(1)" aria-label="Foto siguiente">›</button>
+      <div class="pc-dots">
+        @for(f of fotos(); track f; let i = $index){
+          <button type="button" class="pc-dot" [class.activa]="i === indice()" (click)="ir(i)" [attr.aria-label]="'Ver foto ' + (i + 1)" [attr.aria-current]="i === indice() ? 'true' : null"></button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="pc-body">
+    @if(proyecto().subtitulo){<span class="pc-lugar">{{proyecto().subtitulo}}</span>}
+    <h3 class="pc-titulo">{{proyecto().titulo}}</h3>
+    @if(proyecto().descripcion){<p class="pc-desc">{{proyecto().descripcion}}</p>}
+    @if(fechaTexto()){<span class="pc-fecha">{{fechaTexto()}}</span>}
+    <a routerLink="/contactos" class="pc-enlace">Quiero conocer más <span aria-hidden="true">↗</span></a>
+  </div>
+</article>

@@ -15,7 +15,24 @@ public class ContenidoRepositorio {
             r.getString("titulo"), r.getString("subtitulo"), r.getString("descripcion"),
             r.getString("imagen"), r.getString("imagen_secundaria"), r.getString("contacto"),
             r.getString("cargo"), r.getInt("calificacion"), r.getInt("orden"),
-            r.getBoolean("activo"), r.getLong("version"));
+            r.getBoolean("activo"), r.getLong("version"),
+            r.getString("estado"), r.getString("fecha"), List.of());
+    }
+
+    /** Completa la galería de cada contenido con una sola consulta. */
+    private List<Contenido> conGalerias(List<Contenido> lista) {
+        if (lista.isEmpty()) return lista;
+        Map<Long, List<String>> porContenido = new HashMap<>();
+        db.query("SELECT contenido_id, imagen FROM contenido_imagenes ORDER BY contenido_id, orden, id", rs -> {
+            porContenido.computeIfAbsent(rs.getLong("contenido_id"), k -> new ArrayList<>()).add(rs.getString("imagen"));
+        });
+        return lista.stream().map(c -> c.conGaleria(porContenido.getOrDefault(c.id(), List.of()))).toList();
+    }
+
+    private void guardarGaleria(long id, List<String> galeria) {
+        db.update("DELETE FROM contenido_imagenes WHERE contenido_id=?", id);
+        int orden = 0;
+        for (String url : galeria) db.update("INSERT INTO contenido_imagenes(contenido_id,imagen,orden) VALUES (?,?,?)", id, url, orden++);
     }
 
     private Usuario filaUsuario(java.sql.ResultSet r, int n) throws java.sql.SQLException {
@@ -29,7 +46,7 @@ public class ContenidoRepositorio {
 
     public List<Contenido> listar(boolean publico) {
         String sql = "SELECT * FROM contenidos " + (publico ? "WHERE activo=TRUE " : "") + "ORDER BY tipo, orden, id";
-        return db.query(sql, this::fila);
+        return conGalerias(db.query(sql, this::fila));
     }
 
     public List<Usuario> listarUsuarios() {
@@ -57,16 +74,19 @@ public class ContenidoRepositorio {
     }
 
     public long crear(Contenido c) {
-        return db.queryForObject(
-            "INSERT INTO contenidos(tipo,titulo,subtitulo,descripcion,imagen,imagen_secundaria,contacto,cargo,calificacion,orden,activo) VALUES (?,?,?,?,?,?,?,?,?,?,?) RETURNING id",
+        long id = db.queryForObject(
+            "INSERT INTO contenidos(tipo,titulo,subtitulo,descripcion,imagen,imagen_secundaria,contacto,cargo,calificacion,orden,activo,estado,fecha) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id",
             Long.class, c.tipo().name(), c.titulo(), c.subtitulo(), c.descripcion(),
-            c.imagen(), c.imagenSecundaria(), c.contacto(), c.cargo(), c.calificacion(), c.orden(), c.activo());
+            c.imagen(), c.imagenSecundaria(), c.contacto(), c.cargo(), c.calificacion(), c.orden(), c.activo(), c.estado(), c.fecha());
+        guardarGaleria(id, c.galeria());
+        return id;
     }
 
     public void editar(long id, Contenido c) {
-        int filas = db.update("UPDATE contenidos SET titulo=?,subtitulo=?,descripcion=?,imagen=?,imagen_secundaria=?,contacto=?,cargo=?,calificacion=?,orden=?,activo=?,version=version+1 WHERE id=? AND version=?",
-            c.titulo(), c.subtitulo(), c.descripcion(), c.imagen(), c.imagenSecundaria(), c.contacto(), c.cargo(), c.calificacion(), c.orden(), c.activo(), id, c.version());
+        int filas = db.update("UPDATE contenidos SET titulo=?,subtitulo=?,descripcion=?,imagen=?,imagen_secundaria=?,contacto=?,cargo=?,calificacion=?,orden=?,activo=?,estado=?,fecha=?,version=version+1 WHERE id=? AND version=?",
+            c.titulo(), c.subtitulo(), c.descripcion(), c.imagen(), c.imagenSecundaria(), c.contacto(), c.cargo(), c.calificacion(), c.orden(), c.activo(), c.estado(), c.fecha(), id, c.version());
         if (filas == 0) throw new Errores().conflicto();
+        guardarGaleria(id, c.galeria());
     }
 
     public void eliminar(long id, long version) {
@@ -132,7 +152,7 @@ public class ContenidoRepositorio {
     }
 
     public Contenido obtener(long id) {
-        return db.query("SELECT * FROM contenidos WHERE id=?", this::fila, id).stream().findFirst().orElseThrow(Errores::conflicto);
+        return conGalerias(db.query("SELECT * FROM contenidos WHERE id=?", this::fila, id)).stream().findFirst().orElseThrow(Errores::conflicto);
     }
 
     public void bloquear() {

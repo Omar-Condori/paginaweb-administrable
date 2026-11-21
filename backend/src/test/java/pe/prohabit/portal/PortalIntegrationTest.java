@@ -71,7 +71,7 @@ class PortalIntegrationTest {
  @Test void protegeAdministradorYSingleton() throws Exception {
   long id=admin.get("/api/sesion").path("id").asLong();
   assertEquals(400,admin.pedir("DELETE","/api/admin/usuarios/"+id+"?version=0","",true).statusCode());
-  var c=contenido("/ejemplos/parque.svg");c.put("tipo","CASA_MODELO");c.put("imagenSecundaria","/ejemplos/interior.svg");
+  var c=contenido("/ejemplos/parque.svg");c.put("tipo","NOSOTROS");
   assertEquals(400,admin.pedir("POST","/api/admin/contenidos",json.writeValueAsString(c),true).statusCode());
   c.put("tipo","TESTIMONIO");c.put("calificacion",8);assertEquals(400,admin.pedir("POST","/api/admin/contenidos",json.writeValueAsString(c),true).statusCode());
  }

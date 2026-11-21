@@ -29,11 +29,26 @@
             <span class="hero-wave" aria-hidden="true"></span>
 
             <div class="hero-copy">
-              <h1>{{foto.titulo}}</h1>
+              <h1 [attr.aria-label]="foto.titulo" [style.--hero-fs]="escalaTitulo(foto.titulo) + 'vw'">
+                @for(p of palabras(foto.titulo); track $index){<span class="hero-word" aria-hidden="true"><span [style.--i]="$index">{{p}}</span></span>{{' '}}}
+              </h1>
               <p class="hero-subtitle">{{foto.subtitulo}}</p>
               <a class="btn cream" href="#proyectos">Descubre nuestros proyectos ↗</a>
             </div>
           </div>
+        }
+
+        <!-- Pestañas con barra de progreso (abajo a la derecha) -->
+        @if(items('CARRUSEL').length > 1){
+          <nav class="hero-tabs" aria-label="Seleccionar diapositiva">
+            @for(t of items('CARRUSEL'); track t.id; let i = $index){
+              <button type="button" class="hero-tab" [class.active]="i === slide()" [class.playing]="i === slide() && reproduciendo()"
+                      [attr.aria-current]="i === slide() ? 'true' : null" [attr.title]="t.titulo" (click)="irA(i)">
+                <span class="hero-tab-label">{{t.titulo}}</span>
+                @if(i === slide()){<i class="hero-tab-bar" aria-hidden="true"></i>}
+              </button>
+            }
+          </nav>
         }
 
         <div class="container hero-bottom">
@@ -41,7 +56,7 @@
             <button (click)="mover(-1)" aria-label="Imagen anterior">←</button>
             <span>{{slide()+1}} / {{items('CARRUSEL').length}}</span>
             <button (click)="mover(1)" aria-label="Imagen siguiente">→</button>
-            <button (click)="reproduciendo.set(!reproduciendo())" [attr.aria-label]="reproduciendo()?'Pausar carrusel':'Reproducir carrusel'">{{reproduciendo()?'Ⅱ':'▶'}}</button>
+            <button (click)="alternarReproduccion()" [attr.aria-label]="reproduciendo()?'Pausar carrusel':'Reproducir carrusel'">{{reproduciendo()?'Ⅱ':'▶'}}</button>
           </div>
         </div>
       </section>
@@ -59,17 +74,7 @@
 
       <div class="cards-grid">
         @for(c of items('PROYECTO');track c.id){
-          <article class="project-card">
-            <div class="card-image">
-              <img [src]="c.imagen" [alt]="c.titulo" loading="lazy">
-              <span class="image-label">{{c.subtitulo}}</span>
-            </div>
-            <div class="card-body">
-              <h3>{{c.titulo}}</h3>
-              <p>{{c.descripcion}}</p>
-              <a routerLink="/contactos" class="text-link">Quiero conocer más <span>↗</span></a>
-            </div>
-          </article>
+          <app-proyecto-card [proyecto]="c" />
         }
       </div>
     </section>
@@ -77,29 +82,7 @@
 
   <!-- Casa modelo -->
   @if(visible('CASA_MODELO')){
-    @if(items('CASA_MODELO')[0];as c){
-      <section class="model-section">
-        <div class="container section-heading">
-          <span class="eyebrow">{{seccion('CASA_MODELO')?.titulo}}</span>
-          <h2>{{seccion('CASA_MODELO')?.subtitulo}}</h2>
-        </div>
-
-        <div class="model-stage">
-          <img class="model-backdrop" [src]="c.imagen" [alt]="c.titulo" loading="lazy">
-          <div class="container model-container">
-            <article class="model-card">
-              <img [src]="c.imagenSecundaria" alt="Interior de la casa modelo" loading="lazy">
-              <div>
-                <span class="eyebrow">{{c.subtitulo}}</span>
-                <h3>{{c.titulo}}</h3>
-                <p>{{c.descripcion}}</p>
-                <a class="text-link" routerLink="/contactos">Agenda una visita ↗</a>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-    }
+    <app-casa-modelo [items]="items('CASA_MODELO')" [seccion]="seccion('CASA_MODELO')" />
   }
 
   <!-- Recreación -->

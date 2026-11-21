@@ -27,6 +27,25 @@
   <router-outlet />
 </main>
 
+<!-- ============ MARCAS (carrusel infinito) ============ -->
+@if(marcas().length){
+  <section class="marcas" aria-label="Marcas con las que trabajamos">
+    @if(tituloMarcas()){
+      <h2 class="marcas-titulo">{{tituloMarcas()}}</h2>
+    }
+    <div class="marcas-ventana">
+      <ul class="marcas-pista" [style.--marcas-duracion]="(pistaMarcas().length * 4) + 's'">
+        @for(m of pistaMarcas(); track $index){
+          <li class="marca-item"><img [src]="m.imagen" [alt]="m.titulo" [title]="m.titulo" loading="lazy" draggable="false"></li>
+        }
+        @for(m of pistaMarcas(); track $index){
+          <li class="marca-item" aria-hidden="true"><img [src]="m.imagen" alt="" loading="lazy" draggable="false"></li>
+        }
+      </ul>
+    </div>
+  </section>
+}
+
 <!-- ============ FOOTER ============ -->
 @if(sitio(); as s){
   <footer class="site-footer">

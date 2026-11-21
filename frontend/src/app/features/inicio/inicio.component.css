@@ -110,16 +110,18 @@
   box-shadow: inset 1px 0 0 rgba(255, 255, 255, .35);
 }
 
-.hero-wave::before { left: -85%; transform: skewX(-4deg); opacity: .8; }
-.hero-wave::after  { left: -170%; transform: skewX(-8deg); opacity: .5; }
+.hero-wave::before { left: 85%; transform: skewX(-4deg); opacity: .8; }
+.hero-wave::after  { left: 170%; transform: skewX(-8deg); opacity: .5; }
 
 /* ---------- Contenido: cuadro marca de agua + título ---------- */
 
 .hero-slide .hero-copy {
   position: relative;
   z-index: 4;
-  width: 26%;
+  /* El cuadro se ajusta al título: crece hacia la derecha (hasta el borde) en vez de partir las palabras */
+  width: fit-content;
   min-width: 300px;
+  max-width: calc(60% - 24px);
   margin: 0 0 0 40%;
   padding: 3vw 3.4vw 3vw 2.15vw;
   display: flex;
@@ -147,13 +149,25 @@
   font-family: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif;
   font-weight: 400;
   font-style: normal;
-  font-size: clamp(2.2rem, 5.5vw, 7rem);
+  font-size: clamp(2rem, var(--hero-fs, 5.5vw), 7rem);   /* --hero-fs la calcula el componente según el título */
   line-height: 1.02;
   letter-spacing: -.01em;
   text-transform: uppercase;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;   /* solo parte una palabra si no cabe de ninguna otra forma */
+  hyphens: manual;
   color: #fff;
-  animation: hero-text-in 1s cubic-bezier(.2, .8, .2, 1) 1s both;
+}
+
+/* Revelado con máscara: cada palabra sube desde detrás de un recorte */
+.hero-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: .08em;
+}
+.hero-word > span {
+  display: inline-block;
+  animation: hero-word-up .9s cubic-bezier(.2, .8, .2, 1) calc(1s + var(--i, 0) * .09s) both;
 }
 
 /* Subtítulo como "pastilla" con círculo (como en la referencia) */
@@ -212,14 +226,14 @@
 
 .hero-slide .hero-copy .btn:hover { background: transparent; color: #fff; transform: none; border-bottom-color: #fff; }
 
-.hero-bottom { z-index: 6; }
+.hero-bottom { z-index: 6; justify-content: flex-start; }
 
 /* ---------- Keyframes ---------- */
 
 /* la imagen se descubre siguiendo el borde de la línea de agua */
 @keyframes hero-reveal {
-  from { clip-path: inset(0 106% 0 0); }
-  to   { clip-path: inset(0 -6% 0 0); }
+  from { clip-path: inset(0 0 0 106%); }
+  to   { clip-path: inset(0 0 0 -6%); }
 }
 
 /* los paneles del marco crecen desde abajo hacia arriba */
@@ -230,16 +244,16 @@
 }
 
 @keyframes hero-wave {
-  from { left: -12%; opacity: 0; }
+  from { left: 100%; opacity: 0; }
   12%  { opacity: 1; }
   88%  { opacity: 1; }
-  to   { left: 100%; opacity: 0; }
+  to   { left: -12%; opacity: 0; }
 }
 
 /* la slide anterior se oscurece y se desplaza levemente mientras sale */
 @keyframes hero-leave {
   from { opacity: 1; transform: translateX(0) scale(1); filter: brightness(1); }
-  to   { opacity: 1; transform: translateX(2%) scale(1.03); filter: brightness(.7); }
+  to   { opacity: 1; transform: translateX(-2%) scale(1.03); filter: brightness(.7); }
 }
 
 /* curva: la subida (Y) y el balanceo (X + giro) usan distinta aceleración */
@@ -255,9 +269,75 @@
   to   { transform: translateX(0) rotate(0); }
 }
 
+@keyframes hero-word-up {
+  from { transform: translateY(105%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes hero-tab-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
 @keyframes hero-text-in {
   from { opacity: 0; transform: translateY(26px); clip-path: inset(0 0 100% 0); }
   to   { opacity: 1; transform: translateY(0);    clip-path: inset(-20% -10% -20% -10%); }
+}
+
+
+/* ---------- Pestañas de diapositivas con barra de progreso (abajo a la derecha) ---------- */
+
+.hero { --hero-slide-dur: 6.5s; }
+
+.hero-tabs {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 7;
+  display: flex;
+  max-width: min(100%, 720px);
+}
+
+.hero-tab {
+  position: relative;
+  min-width: 118px;
+  max-width: 220px;
+  padding: 16px 22px 17px;
+  border: 0;
+  background: #1c479b;           /* azul Prohabit */
+  color: #fff;
+  font-family: inherit;
+  font-size: .66rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background .3s ease;
+}
+.hero-tab-label { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hero-tab:hover { background: #2456b8; }
+.hero-tab.active { background: #0f1b33; }   /* activa: azul noche */
+.hero-tab:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
+
+.hero-tab-bar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: var(--gold, #bc935d);
+  transform-origin: left center;
+  transform: scaleX(1);          /* en pausa: barra completa */
+}
+.hero-tab.playing .hero-tab-bar {
+  transform: scaleX(0);
+  animation: hero-tab-fill var(--hero-slide-dur) linear both;
+}
+
+@media (max-width: 720px) {
+  .hero-tabs { left: 0; max-width: none; }
+  .hero-tab { flex: 1 1 0; min-width: 0; padding: 14px 8px 15px; font-size: .58rem; letter-spacing: .03em; }
+  .hero-bottom { bottom: 64px; }
 }
 
 /* ---------- Responsive ---------- */
@@ -265,13 +345,15 @@
 @media (max-width: 1024px) {
   .hero-frame { display: none; }
   .hero-slide { justify-content: center; }
-  .hero-slide .hero-copy { margin: 0; width: min(560px, calc(100% - 32px)); padding: 32px 28px; }
+  .hero-slide .hero-copy { margin: 0; width: fit-content; min-width: min(420px, calc(100% - 32px)); max-width: calc(100% - 32px); padding: 32px 28px; }
   .hero-slide .hero-copy .btn { left: 28px; }
-  .hero-slide .hero-copy h1 { font-size: clamp(2rem, 9vw, 4.2rem); }
+  /* en pantallas angostas el cuadro ocupa casi todo el ancho (~85vw frente a ~50vw): se escala el tamaño calculado */
+  .hero-slide .hero-copy h1 { font-size: clamp(1.8rem, calc(var(--hero-fs, 5vw) * 1.6), 4.2rem); }
 }
 
 @media (max-width: 720px) {
-  .hero-slide .hero-copy { width: calc(100% - 32px); }
+  .hero-slide .hero-copy { width: calc(100% - 32px); min-width: 0; }
+  .hero-bottom { justify-content: center; }
   .hero-slide .hero-copy .hero-subtitle { font-size: .68rem; letter-spacing: .2em; }
   .hero-wave { --hero-wave-w: 22%; }
 }
@@ -287,9 +369,12 @@
   .hero-slide .hero-copy h1,
   .hero-slide .hero-copy .hero-subtitle,
   .hero-slide .hero-copy .btn,
+  .hero-word > span,
+  .hero-tab.playing .hero-tab-bar,
   .hero-slide-leave {
     animation: none;
   }
+  .hero-tab.playing .hero-tab-bar { transform: scaleX(1); }
   .hero-wave { display: none; }
 }
 

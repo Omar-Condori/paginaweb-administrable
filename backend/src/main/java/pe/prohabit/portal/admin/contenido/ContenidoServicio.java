@@ -26,9 +26,10 @@ public class ContenidoServicio {
         boolean tarjeta = c.tipo() == Tipo.NOSOTROS_VALORES;
         if (tarjeta && c.descripcion().isBlank()) throw Errores.invalido("La descripción de la tarjeta es obligatoria");
         imagen(c.imagen(), !tarjeta);
-        imagen(c.imagenSecundaria(), c.tipo() == Tipo.CASA_MODELO);
+        imagen(c.imagenSecundaria(), false);
+        for (String foto : c.galeria()) imagen(foto, true);
         if (c.tipo() == Tipo.VENTAS && (c.contacto().isBlank() || c.cargo().isBlank())) throw Errores.invalido("Ventas requiere contacto y rol");
-        if (c.tipo() == Tipo.CASA_MODELO || c.tipo() == Tipo.NOSOTROS) {
+        if (c.tipo() == Tipo.NOSOTROS) {
             long total = r.listar(false).stream().filter(v -> v.tipo() == c.tipo() && !Objects.equals(v.id(), id)).count();
             if (total > 0) throw Errores.invalido("Esta sección admite un solo contenido. Edita el existente.");
         }

@@ -23,17 +23,7 @@
 
     <div class="cards-grid">
       @for(c of items('PROYECTO');track c.id){
-        <article class="project-card">
-          <div class="card-image">
-            <img [src]="c.imagen" [alt]="c.titulo" loading="lazy">
-            <span class="image-label">{{c.subtitulo}}</span>
-          </div>
-          <div class="card-body">
-            <h3>{{c.titulo}}</h3>
-            <p>{{c.descripcion}}</p>
-            <a routerLink="/contactos" class="text-link">Quiero conocer más <span>↗</span></a>
-          </div>
-        </article>
+        <app-proyecto-card [proyecto]="c" />
       }
     </div>
   </section>

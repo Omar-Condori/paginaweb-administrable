@@ -1,14 +1,15 @@
 import { Component, inject, signal, OnDestroy, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
 import { Sitio, Tipo } from '../../modelos';
 import { InicioService } from './inicio.service';
 import { mensajeError } from '../../api';
+import { ProyectoCardComponent } from '../../shared/proyecto-card/proyecto-card.component';
+import { CasaModeloComponent } from '../../shared/casa-modelo/casa-modelo.component';
 
 @Component({
   selector: 'app-inicio',
-  imports: [RouterLink],
+  imports: [ProyectoCardComponent, CasaModeloComponent],
   templateUrl: './inicio.component.html',
   styleUrl: './inicio.component.css'
 })
@@ -23,16 +24,53 @@ export class InicioComponent implements OnDestroy, OnInit {
   reproduciendo = signal(!matchMedia('(prefers-reduced-motion: reduce)').matches);
   mapa: SafeResourceUrl | null = null;
 
-  private reloj = setInterval(() => {
-    if (this.reproduciendo() && !document.hidden) this.mover(1);
-  }, 6500);
+  /** Duración de cada diapositiva (ms). Debe coincidir con --hero-slide-dur del CSS. */
+  readonly duracion = 6500;
+  private temporizador?: ReturnType<typeof setTimeout>;
+
+  /** (Re)inicia la cuenta regresiva de la diapositiva actual; la barra de progreso de las pestañas va sincronizada. */
+  private programar() {
+    clearTimeout(this.temporizador);
+    if (!this.reproduciendo()) return;
+    this.temporizador = setTimeout(() => {
+      if (document.hidden) this.programar(); else this.mover(1);
+    }, this.duracion);
+  }
+
+  alternarReproduccion() {
+    this.reproduciendo.update(v => !v);
+    this.programar();
+  }
+
+  irA(indice: number) {
+    this.slide.set(indice);
+    this.programar();
+  }
+
+  /**
+   * Tamaño del título en vw. Se calcula para que la palabra más larga quepa SIN partirse
+   * dentro del ancho disponible (~50vw) y para que títulos muy largos no crezcan de más.
+   */
+  escalaTitulo(titulo: string): number {
+    const palabras = this.palabras(titulo);
+    const larga = Math.max(4, ...palabras.map(p => p.length));
+    const porPalabra = 50 / (larga * 0.7);                       // ancho medio de una mayúscula ≈ 0.7em
+    const porLargo = titulo.length > 38 ? 3.6 : titulo.length > 24 ? 4.6 : 5.6;
+    return Math.round(Math.min(5.6, porPalabra, porLargo) * 100) / 100;
+  }
+
+  /** Palabras del título para la animación de revelado con máscara. */
+  palabras(titulo: string) {
+    return (titulo || '').split(/\s+/).filter(Boolean);
+  }
 
   async ngOnInit() {
     await this.cargar();
+    this.programar();
   }
 
   ngOnDestroy() {
-    clearInterval(this.reloj);
+    clearTimeout(this.temporizador);
   }
 
   async cargar() {
@@ -64,6 +102,7 @@ export class InicioComponent implements OnDestroy, OnInit {
   mover(delta: number) {
     const n = this.items('CARRUSEL').length;
     this.slide.set(n ? (this.slide() + delta + n) % n : 0);
+    this.programar();
   }
 
   estrellas(n: number) {
